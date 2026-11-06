@@ -8,7 +8,7 @@ Plataforma de asesorías uno a uno entre estudiantes y tutores. Implementa las r
 | | |
 |---|---|
 | Repositorio | https://github.com/egari12/PIA_AulaPlus |
-| Despliegue (Swagger) | _pendiente: pegar aquí la URL de Render, p. ej. https://aulaplus-api.onrender.com/docs_ |
+| Despliegue (Swagger) | https://aulaplus-api-lcb6.onrender.com/docs |
 
 ## Estructura
 
