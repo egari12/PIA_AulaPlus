@@ -1,0 +1,21 @@
+﻿caso_id,operacion_id,accion_sugerida,estado_inicial,resultado_alumno,instrucciones,estado_final,eventos,excepcion,http_equivalente
+AUL-S001,AUL-O001,completar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,FINALIZADA,InscripcionValidada > InscripcionConfirmada > InscripcionFinalizada,,200
+AUL-S002,AUL-O002,cancelar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADA,InscripcionCancelada,,200
+AUL-S003,AUL-O003,repetir_aprobacion,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,VALIDADA,InscripcionValidada,TransicionInvalida en 'validar': Inscripcion: no se permite 'validar' desde el estado VALIDADA,409
+AUL-S004,AUL-O004,saltar_estado,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,PREINSCRITA,(ninguno),TransicionInvalida en 'inscribir': Inscripcion: no se permite 'inscribir' desde el estado PREINSCRITA,409
+AUL-S005,AUL-O005,aprobar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,VALIDADA,InscripcionValidada,,200
+AUL-S006,AUL-O006,completar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,FINALIZADA,InscripcionValidada > InscripcionConfirmada > InscripcionFinalizada,,200
+AUL-S007,AUL-O007,cancelar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADA,InscripcionCancelada,,200
+AUL-S008,AUL-O008,repetir_aprobacion,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,PREINSCRITA,(ninguno),DatosInvalidos en 'validar': No puede procesarse: falla autorización,422
+AUL-S009,AUL-O009,saltar_estado,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,PREINSCRITA,(ninguno),TransicionInvalida en 'inscribir': Inscripcion: no se permite 'inscribir' desde el estado PREINSCRITA,409
+AUL-S010,AUL-O010,aprobar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,VALIDADA,InscripcionValidada,,200
+AUL-S011,AUL-O011,completar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,FINALIZADA,InscripcionValidada > InscripcionConfirmada > InscripcionFinalizada,,200
+AUL-S012,AUL-O012,cancelar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADA,InscripcionCancelada,,200
+AUL-S013,AUL-O013,repetir_aprobacion,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,PREINSCRITA,(ninguno),DatosInvalidos en 'validar': No puede procesarse: falla detalle no vacío,422
+AUL-S014,AUL-O014,saltar_estado,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,PREINSCRITA,(ninguno),TransicionInvalida en 'inscribir': Inscripcion: no se permite 'inscribir' desde el estado PREINSCRITA,409
+AUL-S015,AUL-O015,aprobar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,VALIDADA,InscripcionValidada,,200
+AUL-S016,AUL-O016,completar,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,PREINSCRITA,(ninguno),DatosInvalidos en 'validar': No puede procesarse: falla autorización,422
+AUL-S017,AUL-O017,cancelar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADA,InscripcionCancelada,,200
+AUL-S018,AUL-O018,repetir_aprobacion,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,VALIDADA,InscripcionValidada,TransicionInvalida en 'validar': Inscripcion: no se permite 'validar' desde el estado VALIDADA,409
+AUL-S019,AUL-O019,saltar_estado,PREINSCRITA,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,PREINSCRITA,(ninguno),TransicionInvalida en 'inscribir': Inscripcion: no se permite 'inscribir' desde el estado PREINSCRITA,409
+AUL-S020,AUL-O020,aprobar,PREINSCRITA,OK,Ejecutar la operacion y registrar evento o excepcion,VALIDADA,InscripcionValidada,,200
