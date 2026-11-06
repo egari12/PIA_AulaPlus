@@ -1,0 +1,2465 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AulaPlus API",
+    "description": "\nAPI de **AulaPlus**: asesorías uno a uno entre estudiantes y tutores.\n\n* **Sesiones** (BRD): reserva con 48 h de anticipación, asignación automática de tutor,\n  cobro de $200, grabación con umbral de 70 %, liquidación 80/20, cancelaciones por Soporte,\n  calificación en 24 h.\n* **Inscripciones**: contexto agregado para ejecutar el paquete de pruebas CSV del docente.\n\nEnvíe el encabezado **X-Rol** (ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA)\nen las operaciones que cambian datos de sesiones, tutores o políticas.\n",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/sesiones": {
+      "post": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "US-01/02/03: reservar sesión (asigna tutor y cobra $200)",
+        "operationId": "reservar_sesiones_post",
+        "parameters": [
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservaEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "Listar sesiones",
+        "operationId": "listar_sesiones_get",
+        "parameters": [
+          {
+            "name": "estado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EstadoSesion"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SesionSalida"
+                  },
+                  "title": "Response Listar Sesiones Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}": {
+      "get": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "Consultar sesión",
+        "operationId": "obtener_sesiones__sesion_id__get",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}/eventos": {
+      "get": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "Domain Events registrados de la sesión",
+        "operationId": "eventos_sesiones__sesion_id__eventos_get",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventoSalida"
+                  },
+                  "title": "Response Eventos Sesiones  Sesion Id  Eventos Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}/grabacion": {
+      "post": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "US-14: registrar grabación (>= 70 % completa, < 70 % reembolsa)",
+        "operationId": "registrar_grabacion_sesiones__sesion_id__grabacion_post",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrabacionEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}/liquidacion": {
+      "post": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "US-11: liquidar $160 al tutor y $40 de comisión",
+        "operationId": "liquidar_sesiones__sesion_id__liquidacion_post",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiquidacionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}/cancelacion": {
+      "post": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "US-13: Soporte ejecuta la cancelación (aplica reembolso/penalización)",
+        "operationId": "cancelar_sesiones__sesion_id__cancelacion_post",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelacionEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}/calificaciones": {
+      "post": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "US-04 / RN-10: calificar dentro de 24 h",
+        "operationId": "calificar_sesiones__sesion_id__calificaciones_post",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalificacionEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}/cambios": {
+      "post": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "US-06/07: solicitar cambio de horario o modalidad",
+        "operationId": "solicitar_cambio_sesiones__sesion_id__cambios_post",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambioEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/sesiones/{sesion_id}/cambios/aplicar": {
+      "post": {
+        "tags": [
+          "Sesiones"
+        ],
+        "summary": "Soporte aplica el cambio pendiente",
+        "operationId": "aplicar_cambio_sesiones__sesion_id__cambios_aplicar_post",
+        "parameters": [
+          {
+            "name": "sesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sesion Id"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/tutores": {
+      "get": {
+        "tags": [
+          "Tutores"
+        ],
+        "summary": "Listar tutores",
+        "operationId": "listar_tutores_tutores_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TutorSalida"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Tutores Tutores Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/tutores/{tutor_id}": {
+      "get": {
+        "tags": [
+          "Tutores"
+        ],
+        "summary": "Consultar tutor",
+        "operationId": "obtener_tutor_tutores__tutor_id__get",
+        "parameters": [
+          {
+            "name": "tutor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tutor Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/tutores/{tutor_id}/disponibilidad": {
+      "put": {
+        "tags": [
+          "Tutores"
+        ],
+        "summary": "US-09: actualizar disponibilidad del tutor",
+        "operationId": "actualizar_disponibilidad_tutores__tutor_id__disponibilidad_put",
+        "parameters": [
+          {
+            "name": "tutor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tutor Id"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisponibilidadEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/reportes/sesiones": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "US-15: sesiones agendadas, completadas y canceladas por periodo",
+        "operationId": "reporte_sesiones_reportes_sesiones_get",
+        "parameters": [
+          {
+            "name": "desde",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Desde"
+            }
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Hasta"
+            }
+          },
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReporteSesionesSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/reportes/cancelaciones-tutores": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "US-15: tutores ordenados por cancelaciones con su estado de penalización",
+        "operationId": "reporte_cancelaciones_reportes_cancelaciones_tutores_get",
+        "parameters": [
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CancelacionesTutorSalida"
+                  },
+                  "title": "Response Reporte Cancelaciones Reportes Cancelaciones Tutores Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/politicas": {
+      "get": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "Política de tarifas vigente",
+        "operationId": "obtener_politica_politicas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoliticaSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/politicas/comision": {
+      "put": {
+        "tags": [
+          "Administración"
+        ],
+        "summary": "US-16: Administración cambia el % de comisión (aplica a liquidaciones futuras)",
+        "operationId": "actualizar_comision_politicas_comision_put",
+        "parameters": [
+          {
+            "name": "X-Rol",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Rol",
+              "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+            },
+            "description": "Rol de quien llama: ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComisionEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoliticaSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/estudiantes": {
+      "get": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "Listar estudiantes (actores.csv)",
+        "operationId": "listar_estudiantes_estudiantes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EstudianteSalida"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Estudiantes Estudiantes Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/cursos": {
+      "get": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "Catálogo de cursos (catalogo.csv)",
+        "operationId": "listar_cursos_cursos_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CursoSalida"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Cursos Cursos Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones": {
+      "get": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "Listar inscripciones",
+        "operationId": "listar_inscripciones_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InscripcionSalida"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Inscripciones Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "Crear inscripción en PREINSCRITA",
+        "operationId": "crear_inscripciones_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InscripcionEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcion_id}": {
+      "get": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "Consultar inscripción",
+        "operationId": "obtener_inscripciones__inscripcion_id__get",
+        "parameters": [
+          {
+            "name": "inscripcion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcion_id}/eventos": {
+      "get": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "Domain Events de la inscripción",
+        "operationId": "eventos_inscripciones__inscripcion_id__eventos_get",
+        "parameters": [
+          {
+            "name": "inscripcion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventoSalida"
+                  },
+                  "title": "Response Eventos Inscripciones  Inscripcion Id  Eventos Get"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcion_id}/beneficio": {
+      "get": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "Evaluar beneficio: preferente AND total >= 1500 AND NOT promoción",
+        "operationId": "beneficio_inscripciones__inscripcion_id__beneficio_get",
+        "parameters": [
+          {
+            "name": "inscripcion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficioSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcion_id}/validar": {
+      "post": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "PREINSCRITA -> VALIDADA (activo AND detalle AND autorización)",
+        "operationId": "validar_inscripciones__inscripcion_id__validar_post",
+        "parameters": [
+          {
+            "name": "inscripcion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcion_id}/inscribir": {
+      "post": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "VALIDADA -> INSCRITA (cursos habilitados AND cupo)",
+        "operationId": "inscribir_inscripciones__inscripcion_id__inscribir_post",
+        "parameters": [
+          {
+            "name": "inscripcion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcion_id}/finalizar": {
+      "post": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "INSCRITA -> FINALIZADA",
+        "operationId": "finalizar_inscripciones__inscripcion_id__finalizar_post",
+        "parameters": [
+          {
+            "name": "inscripcion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcion_id}/cancelar": {
+      "post": {
+        "tags": [
+          "Inscripciones (paquete CSV)"
+        ],
+        "summary": "PREINSCRITA/VALIDADA -> CANCELADA",
+        "operationId": "cancelar_inscripciones__inscripcion_id__cancelar_post",
+        "parameters": [
+          {
+            "name": "inscripcion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcion Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotivoEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionSalida"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Pago rechazado"
+          },
+          "403": {
+            "description": "Rol sin permiso"
+          },
+          "404": {
+            "description": "No encontrado"
+          },
+          "409": {
+            "description": "Transición inválida o recurso no disponible"
+          },
+          "422": {
+            "description": "Datos inválidos o regla de negocio violada"
+          }
+        }
+      }
+    },
+    "/salud": {
+      "get": {
+        "tags": [
+          "Salud"
+        ],
+        "summary": "Verificación de vida",
+        "operationId": "salud_salud_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Salud Salud Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BeneficioSalida": {
+        "properties": {
+          "inscripcion_id": {
+            "type": "string",
+            "title": "Inscripcion Id"
+          },
+          "aplica": {
+            "type": "boolean",
+            "title": "Aplica"
+          },
+          "regla": {
+            "type": "string",
+            "title": "Regla"
+          },
+          "incumplidas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Incumplidas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inscripcion_id",
+          "aplica",
+          "regla",
+          "incumplidas"
+        ],
+        "title": "BeneficioSalida"
+      },
+      "BloqueEntrada": {
+        "properties": {
+          "dia_semana": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Dia Semana",
+            "description": "0 = lunes ... 6 = domingo"
+          },
+          "hora_inicio": {
+            "type": "string",
+            "format": "time",
+            "title": "Hora Inicio",
+            "examples": [
+              "08:00"
+            ]
+          },
+          "hora_fin": {
+            "type": "string",
+            "format": "time",
+            "title": "Hora Fin",
+            "examples": [
+              "14:00"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "dia_semana",
+          "hora_inicio",
+          "hora_fin"
+        ],
+        "title": "BloqueEntrada"
+      },
+      "CalificacionEntrada": {
+        "properties": {
+          "puntuacion": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Puntuacion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "puntuacion"
+        ],
+        "title": "CalificacionEntrada"
+      },
+      "CambioEntrada": {
+        "properties": {
+          "tipo": {
+            "$ref": "#/components/schemas/TipoCambio"
+          },
+          "valor": {
+            "type": "string",
+            "title": "Valor",
+            "description": "Nueva fecha ISO 8601 o nueva modalidad",
+            "examples": [
+              "EN_LINEA"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "tipo",
+          "valor"
+        ],
+        "title": "CambioEntrada"
+      },
+      "CancelacionEntrada": {
+        "properties": {
+          "solicitante": {
+            "$ref": "#/components/schemas/Solicitante"
+          },
+          "motivo": {
+            "type": "string",
+            "title": "Motivo",
+            "examples": [
+              "El estudiante tiene un examen"
+            ]
+          },
+          "justificada": {
+            "type": "boolean",
+            "title": "Justificada",
+            "description": "Emergencia médica/legal con justificante (RN-09)",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "solicitante",
+          "motivo"
+        ],
+        "title": "CancelacionEntrada"
+      },
+      "CancelacionesTutorSalida": {
+        "properties": {
+          "tutor_id": {
+            "type": "string",
+            "title": "Tutor Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "cancelaciones": {
+            "type": "integer",
+            "title": "Cancelaciones"
+          },
+          "penalizaciones": {
+            "type": "integer",
+            "title": "Penalizaciones"
+          },
+          "estado_penalizacion": {
+            "type": "string",
+            "title": "Estado Penalizacion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tutor_id",
+          "nombre",
+          "cancelaciones",
+          "penalizaciones",
+          "estado_penalizacion"
+        ],
+        "title": "CancelacionesTutorSalida"
+      },
+      "ComisionEntrada": {
+        "properties": {
+          "porcentaje": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Porcentaje",
+            "examples": [
+              "25"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "porcentaje"
+        ],
+        "title": "ComisionEntrada"
+      },
+      "CursoSalida": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "descripcion": {
+            "type": "string",
+            "title": "Descripcion"
+          },
+          "precio": {
+            "type": "string",
+            "title": "Precio"
+          },
+          "cupo": {
+            "type": "integer",
+            "title": "Cupo"
+          },
+          "habilitado": {
+            "type": "boolean",
+            "title": "Habilitado"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "descripcion",
+          "precio",
+          "cupo",
+          "habilitado"
+        ],
+        "title": "CursoSalida"
+      },
+      "DisponibilidadEntrada": {
+        "properties": {
+          "bloques": {
+            "items": {
+              "$ref": "#/components/schemas/BloqueEntrada"
+            },
+            "type": "array",
+            "title": "Bloques"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bloques"
+        ],
+        "title": "DisponibilidadEntrada"
+      },
+      "EstadoSesion": {
+        "type": "string",
+        "enum": [
+          "CONFIRMADA",
+          "COMPLETADA",
+          "REEMBOLSADA",
+          "LIQUIDADA",
+          "CANCELADA"
+        ],
+        "title": "EstadoSesion"
+      },
+      "EstudianteSalida": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "preferente": {
+            "type": "boolean",
+            "title": "Preferente"
+          },
+          "activo": {
+            "type": "boolean",
+            "title": "Activo"
+          },
+          "ciudad": {
+            "type": "string",
+            "title": "Ciudad"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "preferente",
+          "activo",
+          "ciudad"
+        ],
+        "title": "EstudianteSalida"
+      },
+      "EventoSalida": {
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "ocurrido_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ocurrido En"
+          },
+          "datos": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Datos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nombre",
+          "ocurrido_en",
+          "datos"
+        ],
+        "title": "EventoSalida"
+      },
+      "GrabacionEntrada": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "examples": [
+              "https://grabaciones.aulaplus.mx/ses-001.mp4"
+            ]
+          },
+          "inicio": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Inicio"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "inicio",
+          "fin"
+        ],
+        "title": "GrabacionEntrada"
+      },
+      "InscripcionEntrada": {
+        "properties": {
+          "estudiante_id": {
+            "type": "string",
+            "title": "Estudiante Id",
+            "examples": [
+              "AUL-C005"
+            ]
+          },
+          "lineas": {
+            "items": {
+              "$ref": "#/components/schemas/LineaEntrada"
+            },
+            "type": "array",
+            "title": "Lineas"
+          },
+          "autorizada": {
+            "type": "boolean",
+            "title": "Autorizada",
+            "default": true
+          },
+          "promocion_activa": {
+            "type": "boolean",
+            "title": "Promocion Activa",
+            "default": false
+          },
+          "referencia": {
+            "type": "string",
+            "title": "Referencia",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "estudiante_id",
+          "lineas"
+        ],
+        "title": "InscripcionEntrada"
+      },
+      "InscripcionSalida": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "estudiante_id": {
+            "type": "string",
+            "title": "Estudiante Id"
+          },
+          "fecha_solicitud": {
+            "type": "string",
+            "format": "date",
+            "title": "Fecha Solicitud"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "promocion_activa": {
+            "type": "boolean",
+            "title": "Promocion Activa"
+          },
+          "autorizada": {
+            "type": "boolean",
+            "title": "Autorizada"
+          },
+          "referencia": {
+            "type": "string",
+            "title": "Referencia"
+          },
+          "unidades": {
+            "type": "integer",
+            "title": "Unidades"
+          },
+          "total": {
+            "type": "string",
+            "title": "Total"
+          },
+          "lineas": {
+            "items": {
+              "$ref": "#/components/schemas/LineaSalida"
+            },
+            "type": "array",
+            "title": "Lineas"
+          },
+          "motivo_cancelacion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Cancelacion"
+          },
+          "acciones_permitidas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Acciones Permitidas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "estudiante_id",
+          "fecha_solicitud",
+          "estado",
+          "promocion_activa",
+          "autorizada",
+          "referencia",
+          "unidades",
+          "total",
+          "lineas",
+          "motivo_cancelacion",
+          "acciones_permitidas"
+        ],
+        "title": "InscripcionSalida"
+      },
+      "LineaEntrada": {
+        "properties": {
+          "curso_id": {
+            "type": "string",
+            "title": "Curso Id",
+            "examples": [
+              "AUL-P001"
+            ]
+          },
+          "cantidad": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Cantidad",
+            "examples": [
+              2
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "curso_id",
+          "cantidad"
+        ],
+        "title": "LineaEntrada"
+      },
+      "LineaSalida": {
+        "properties": {
+          "curso_id": {
+            "type": "string",
+            "title": "Curso Id"
+          },
+          "precio_unitario": {
+            "type": "string",
+            "title": "Precio Unitario"
+          },
+          "cantidad": {
+            "type": "integer",
+            "title": "Cantidad"
+          },
+          "subtotal": {
+            "type": "string",
+            "title": "Subtotal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "curso_id",
+          "precio_unitario",
+          "cantidad",
+          "subtotal"
+        ],
+        "title": "LineaSalida"
+      },
+      "LiquidacionSalida": {
+        "properties": {
+          "sesion_id": {
+            "type": "string",
+            "title": "Sesion Id"
+          },
+          "estado_pago": {
+            "type": "string",
+            "title": "Estado Pago"
+          },
+          "monto_tutor": {
+            "type": "string",
+            "title": "Monto Tutor"
+          },
+          "comision": {
+            "type": "string",
+            "title": "Comision"
+          },
+          "referencia": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referencia"
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sesion_id",
+          "estado_pago",
+          "monto_tutor",
+          "comision",
+          "referencia",
+          "mensaje"
+        ],
+        "title": "LiquidacionSalida"
+      },
+      "Modalidad": {
+        "type": "string",
+        "enum": [
+          "EN_LINEA",
+          "PRESENCIAL"
+        ],
+        "title": "Modalidad"
+      },
+      "MotivoEntrada": {
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "title": "Motivo",
+            "examples": [
+              "El estudiante se dio de baja"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "motivo"
+        ],
+        "title": "MotivoEntrada"
+      },
+      "PoliticaSalida": {
+        "properties": {
+          "precio": {
+            "type": "string",
+            "title": "Precio"
+          },
+          "porcentaje_comision": {
+            "type": "string",
+            "title": "Porcentaje Comision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "precio",
+          "porcentaje_comision"
+        ],
+        "title": "PoliticaSalida"
+      },
+      "ReporteSesionesSalida": {
+        "properties": {
+          "desde": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Desde"
+          },
+          "hasta": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Hasta"
+          },
+          "por_estado": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Por Estado"
+          },
+          "por_estado_pago": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Por Estado Pago"
+          },
+          "total_cobrado": {
+            "type": "string",
+            "title": "Total Cobrado"
+          },
+          "total_comisiones": {
+            "type": "string",
+            "title": "Total Comisiones"
+          },
+          "total_reembolsado": {
+            "type": "string",
+            "title": "Total Reembolsado"
+          }
+        },
+        "type": "object",
+        "required": [
+          "desde",
+          "hasta",
+          "por_estado",
+          "por_estado_pago",
+          "total_cobrado",
+          "total_comisiones",
+          "total_reembolsado"
+        ],
+        "title": "ReporteSesionesSalida"
+      },
+      "ReservaEntrada": {
+        "properties": {
+          "estudiante_id": {
+            "type": "string",
+            "title": "Estudiante Id",
+            "examples": [
+              "AUL-C001"
+            ]
+          },
+          "materia": {
+            "type": "string",
+            "title": "Materia",
+            "examples": [
+              "Python"
+            ]
+          },
+          "tema": {
+            "type": "string",
+            "title": "Tema",
+            "examples": [
+              "Listas y diccionarios"
+            ]
+          },
+          "modalidad": {
+            "$ref": "#/components/schemas/Modalidad",
+            "default": "EN_LINEA"
+          },
+          "inicio": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Inicio",
+            "description": "ISO 8601 con zona horaria",
+            "examples": [
+              "2026-11-16T10:00:00-06:00"
+            ]
+          },
+          "zona": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zona",
+            "examples": [
+              "Monterrey"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "estudiante_id",
+          "materia",
+          "tema",
+          "inicio"
+        ],
+        "title": "ReservaEntrada"
+      },
+      "Rol": {
+        "type": "string",
+        "enum": [
+          "ESTUDIANTE",
+          "TUTOR",
+          "SOPORTE",
+          "ADMINISTRADOR",
+          "SISTEMA"
+        ],
+        "title": "Rol"
+      },
+      "SesionSalida": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "estudiante_id": {
+            "type": "string",
+            "title": "Estudiante Id"
+          },
+          "tutor_id": {
+            "type": "string",
+            "title": "Tutor Id"
+          },
+          "materia": {
+            "type": "string",
+            "title": "Materia"
+          },
+          "tema": {
+            "type": "string",
+            "title": "Tema"
+          },
+          "modalidad": {
+            "$ref": "#/components/schemas/Modalidad"
+          },
+          "zona": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zona"
+          },
+          "inicio": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Inicio"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fin"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "estado_pago": {
+            "type": "string",
+            "title": "Estado Pago"
+          },
+          "precio": {
+            "type": "string",
+            "title": "Precio"
+          },
+          "monto_reembolso": {
+            "type": "string",
+            "title": "Monto Reembolso"
+          },
+          "porcentaje_grabado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Porcentaje Grabado"
+          },
+          "monto_tutor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monto Tutor"
+          },
+          "comision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comision"
+          },
+          "tutor_penalizado": {
+            "type": "boolean",
+            "title": "Tutor Penalizado"
+          },
+          "calificacion_tutor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calificacion Tutor"
+          },
+          "calificacion_estudiante": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calificacion Estudiante"
+          },
+          "cambio_pendiente": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cambio Pendiente"
+          },
+          "acciones_permitidas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Acciones Permitidas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "estudiante_id",
+          "tutor_id",
+          "materia",
+          "tema",
+          "modalidad",
+          "zona",
+          "inicio",
+          "fin",
+          "estado",
+          "estado_pago",
+          "precio",
+          "monto_reembolso",
+          "porcentaje_grabado",
+          "monto_tutor",
+          "comision",
+          "tutor_penalizado",
+          "calificacion_tutor",
+          "calificacion_estudiante",
+          "cambio_pendiente",
+          "acciones_permitidas"
+        ],
+        "title": "SesionSalida"
+      },
+      "Solicitante": {
+        "type": "string",
+        "enum": [
+          "ESTUDIANTE",
+          "TUTOR"
+        ],
+        "title": "Solicitante"
+      },
+      "TipoCambio": {
+        "type": "string",
+        "enum": [
+          "HORARIO",
+          "MODALIDAD"
+        ],
+        "title": "TipoCambio"
+      },
+      "TutorSalida": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "materias": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Materias"
+          },
+          "modalidades": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modalidades"
+          },
+          "zona": {
+            "type": "string",
+            "title": "Zona"
+          },
+          "bloques": {
+            "items": {
+              "$ref": "#/components/schemas/BloqueEntrada"
+            },
+            "type": "array",
+            "title": "Bloques"
+          },
+          "cancelaciones": {
+            "type": "integer",
+            "title": "Cancelaciones"
+          },
+          "penalizaciones": {
+            "type": "integer",
+            "title": "Penalizaciones"
+          },
+          "estado_penalizacion": {
+            "type": "string",
+            "title": "Estado Penalizacion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "materias",
+          "modalidades",
+          "zona",
+          "bloques",
+          "cancelaciones",
+          "penalizaciones",
+          "estado_penalizacion"
+        ],
+        "title": "TutorSalida"
+      }
+    }
+  }
+}
