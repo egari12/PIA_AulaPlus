@@ -1,0 +1,26 @@
+[project]
+name = "aulaplus"
+version = "1.0.0"
+description = "AulaPlus: plataforma de asesorías - PIA Componentes de Lógica de Negocio (Equipo 8)"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = false
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["E741", "E742"]

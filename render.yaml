@@ -1,0 +1,26 @@
+# Blueprint de Render: API (Docker) + PostgreSQL gestionado.
+# En Render: New > Blueprint > seleccionar este repositorio.
+services:
+  - type: web
+    name: aulaplus-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /salud
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aulaplus-db
+          property: connectionString
+      - key: SEED_DATOS
+        value: "true"
+      - key: PASARELA_RECHAZAR
+        value: AUL-C040
+      - key: APP_ENV
+        value: produccion
+
+databases:
+  - name: aulaplus-db
+    plan: free
+    databaseName: aulaplus
