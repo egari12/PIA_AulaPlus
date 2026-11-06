@@ -7,6 +7,7 @@ Swagger:   http://localhost:8000/docs     OpenAPI: /openapi.json
 from __future__ import annotations
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from src.api import rutas_admin, rutas_inscripciones, rutas_sesiones
 from src.api.errores import registrar_manejadores
@@ -58,6 +59,10 @@ def create_app(
     app.include_router(rutas_sesiones.router_tutores)
     app.include_router(rutas_admin.router)
     app.include_router(rutas_inscripciones.router)
+
+    @app.get("/", include_in_schema=False)
+    def raiz() -> RedirectResponse:
+        return RedirectResponse(url="/docs")
 
     @app.get("/salud", tags=["Salud"], summary="Verificación de vida")
     def salud() -> dict:

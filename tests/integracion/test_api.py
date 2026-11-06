@@ -44,6 +44,8 @@ def crear_sesion(cliente, **kw):
 def test_salud_y_swagger(cliente):
     assert cliente.get("/salud").json()["estado"] == "ok"
     assert cliente.get("/docs").status_code == 200
+    raiz = cliente.get("/", follow_redirects=False)
+    assert raiz.status_code == 307 and raiz.headers["location"] == "/docs"
     rutas = cliente.get("/openapi.json").json()["paths"]
     assert "/sesiones" in rutas and "/inscripciones/{inscripcion_id}/validar" in rutas
 
