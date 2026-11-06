@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AulaPlus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --papel: #FAFBFD;
+    --cuadro: #E4EAF5;
+    --tinta: #1B2A4A;
+    --tinta-suave: #5A6785;
+    --azul: #2747B8;
+    --azul-claro: #E8EDFB;
+    --rojo: #C8382E;
+    --rojo-claro: #FBE7E5;
+    --verde: #2E7D4F;
+    --verde-claro: #E4F3EA;
+    --linea: #C9D3E6;
+    --blanco: #FFFFFF;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--texto); font-size: 17px; line-height: 1.5; color: var(--tinta);
+    background-color: var(--papel);
+    background-image:
+      linear-gradient(var(--cuadro) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cuadro) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  a { color: var(--azul); }
+  :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  header {
+    display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between;
+    padding: 18px clamp(16px, 4vw, 48px); background: var(--papel); border-bottom: 3px solid var(--tinta);
+  }
+  header h1 { font-family: var(--display); font-weight: 700; font-size: 2rem; line-height: 1; margin: 0; letter-spacing: -0.02em; }
+  header h1 button { all: unset; cursor: pointer; }
+  .sesion-actual { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; color: var(--tinta-suave); }
+  .sesion-actual strong { color: var(--tinta); }
+  .interruptor { display: flex; align-items: center; gap: 8px; font-size: .9rem; }
+
+  .contenedor { max-width: 1180px; margin: 0 auto; padding: 28px clamp(16px, 4vw, 48px) 56px; }
+  .con-bitacora { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr) 340px; align-items: start; }
+  @media (max-width: 960px) { .con-bitacora { grid-template-columns: 1fr; } }
+
+  /* Bienvenida: elegir quién eres */
+  .bienvenida h2 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.1; margin: 8px 0; max-width: 22ch; }
+  .bienvenida > p { color: var(--tinta-suave); max-width: 60ch; margin: 0 0 28px; }
+  .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .rol {
+    font: inherit; text-align: left; cursor: pointer; color: var(--tinta);
+    background: var(--blanco); border: 2px solid var(--tinta); padding: 20px; display: grid; gap: 6px;
+    box-shadow: 4px 4px 0 var(--tinta);
+  }
+  .rol:hover { box-shadow: 6px 6px 0 var(--azul); border-color: var(--azul); }
+  .rol b { font-family: var(--display); font-size: 1.35rem; }
+  .rol span { color: var(--tinta-suave); }
+
+  .hoja { background: var(--blanco); border: 1px solid var(--linea); padding: 24px; }
+  .hoja + .hoja { margin-top: 24px; }
+  h2.titulo { font-family: var(--display); font-weight: 700; font-size: 1.6rem; margin: 0 0 4px; }
+  h3 { font-family: var(--display); font-weight: 500; font-size: 1.2rem; margin: 0 0 6px; }
+  .nota { color: var(--tinta-suave); margin: 0 0 18px; max-width: 65ch; }
+
+  /* Formularios en forma de preguntas */
+  .preguntas { display: grid; gap: 18px; max-width: 640px; }
+  .pregunta { display: grid; gap: 6px; }
+  .pregunta > span { font-weight: 700; }
+  .pregunta small { color: var(--tinta-suave); }
+  .opciones { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opciones label { display: flex; align-items: center; gap: 6px; border: 1px solid var(--linea); padding: 8px 12px; cursor: pointer; background: var(--blanco); }
+  .opciones label:has(input:checked) { border-color: var(--azul); background: var(--azul-claro); font-weight: 700; }
+  input, select {
+    font: inherit; color: var(--tinta); background: var(--blanco);
+    border: 1px solid var(--linea); border-bottom: 2px solid var(--tinta-suave); padding: 9px 11px; min-width: 0;
+  }
+  .boton {
+    font: inherit; font-weight: 700; cursor: pointer; padding: 10px 18px;
+    background: var(--azul); color: var(--blanco); border: 2px solid var(--azul);
+  }
+  .boton.claro { background: var(--blanco); color: var(--azul); }
+  .boton.peligro { background: var(--rojo); border-color: var(--rojo); color: var(--blanco); }
+  .boton.peligro.claro { background: var(--blanco); color: var(--rojo); }
+  .boton.chico { padding: 6px 12px; font-size: .92rem; }
+  .botones { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  /* Mensajes para la persona */
+  .aviso { padding: 14px 16px; border-left: 5px solid; margin: 0 0 18px; }
+  .aviso.bien { background: var(--verde-claro); border-color: var(--verde); }
+  .aviso.mal { background: var(--rojo-claro); border-color: var(--rojo); }
+  .aviso b { display: block; margin-bottom: 2px; }
+
+  /* Tarjetas de asesoría */
+  .asesorias { display: grid; gap: 14px; }
+  .asesoria { border: 1px solid var(--linea); border-left: 6px solid var(--linea); padding: 16px; background: var(--blanco); }
+  .asesoria[data-estado="CONFIRMADA"] { border-left-color: var(--azul); }
+  .asesoria[data-estado="COMPLETADA"], .asesoria[data-estado="LIQUIDADA"] { border-left-color: var(--verde); }
+  .asesoria[data-estado="REEMBOLSADA"], .asesoria[data-estado="CANCELADA"] { border-left-color: var(--rojo); }
+  .asesoria .cuando { font-family: var(--display); font-size: 1.15rem; font-weight: 700; }
+  .asesoria .cuando::first-letter { text-transform: uppercase; }
+  .quien { color: var(--tinta-suave); }
+  .etiqueta { display: inline-block; font-weight: 700; padding: 2px 10px; margin: 8px 0 4px; }
+  .etiqueta.azul { background: var(--azul-claro); color: var(--azul); }
+  .etiqueta.verde { background: var(--verde-claro); color: var(--verde); }
+  .etiqueta.roja { background: var(--rojo-claro); color: var(--rojo); }
+  .explica { margin: 0 0 10px; }
+  .vacio { color: var(--tinta-suave); padding: 8px 0; }
+
+  .estrellas { display: flex; gap: 2px; }
+  .estrellas button { font-size: 1.6rem; line-height: 1; background: none; border: 0; cursor: pointer; color: var(--linea); padding: 2px; }
+  .estrellas button.on { color: #D99A06; }
+
+  .panel { border-top: 1px dashed var(--linea); margin-top: 12px; padding-top: 12px; display: grid; gap: 12px; }
+
+  /* Administración */
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--linea); vertical-align: middle; }
+  th { color: var(--tinta-suave); font-weight: 700; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tabla-scroll { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+  .cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 8px 0 16px; }
+  .cifra { border-left: 4px solid var(--azul); padding: 4px 12px; }
+  .cifra span { display: block; color: var(--tinta-suave); font-size: .9rem; }
+  .cifra b { font-family: var(--display); font-size: 1.6rem; }
+  .pestanas { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--linea); margin-bottom: 20px; }
+  .pestanas button { font: inherit; font-weight: 700; background: none; border: 0; padding: 10px 14px; cursor: pointer; color: var(--tinta-suave); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  .pestanas button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--azul); }
+
+  /* Modo técnico */
+  aside { position: sticky; top: 12px; }
+  .bitacora { list-style: none; margin: 0; padding: 0; max-height: 72vh; overflow-y: auto; }
+  .bitacora li { border-top: 1px solid var(--linea); padding: 10px 0; font-size: .9rem; }
+  .codigo { font-family: var(--display); font-weight: 700; font-size: 1.2rem; margin-right: 6px; }
+  .codigo.ok { color: var(--verde); } .codigo.error { color: var(--rojo); }
+  .peticion { color: var(--tinta-suave); word-break: break-all; }
+  details pre { font-size: .76rem; white-space: pre-wrap; word-break: break-word; background: var(--papel); padding: 8px; margin: 6px 0 0; max-height: 200px; overflow: auto; }
+
+  dialog { border: 2px solid var(--tinta); padding: 24px; max-width: 520px; width: calc(100% - 32px); box-shadow: 6px 6px 0 var(--tinta); }
+  dialog::backdrop { background: rgba(27, 42, 74, .35); }
+  dialog h3 { font-size: 1.35rem; }
+  .consecuencia { background: var(--papel); border: 1px solid var(--linea); padding: 12px; margin: 16px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1><button id="inicio" title="Volver al inicio">AulaPlus</button></h1>
+  <div class="sesion-actual">
+    <span id="quienSoy" hidden></span>
+    <button class="boton claro chico" id="cambiarRol" hidden>Cambiar de usuario</button>
+    <label class="interruptor"><input type="checkbox" id="modoTecnico"> Modo técnico</label>
+  </div>
+</header>
+
+<div class="contenedor">
+  <div id="area">
+    <div>
+      <!-- BIENVENIDA -->
+      <section id="vista-inicio" class="bienvenida">
+        <h2>Asesorías uno a uno, en línea o en persona</h2>
+        <p>Elige cómo quieres entrar. Cada persona ve solo lo que necesita.</p>
+        <div class="roles">
+          <button class="rol" data-rol="ESTUDIANTE"><b>Soy estudiante</b><span>Agendo asesorías, las pago y califico a mi tutor.</span></button>
+          <button class="rol" data-rol="TUTOR"><b>Soy tutor</b><span>Veo mi agenda, lo que me han pagado y mi disponibilidad.</span></button>
+          <button class="rol" data-rol="SOPORTE"><b>Soy de Soporte</b><span>Cancelo asesorías, registro cómo terminó cada clase y pago a los tutores.</span></button>
+          <button class="rol" data-rol="ADMINISTRADOR"><b>Soy administrador</b><span>Consulto reportes, ajusto la comisión y reviso inscripciones.</span></button>
+        </div>
+      </section>
+
+      <!-- ESTUDIANTE -->
+      <section id="vista-ESTUDIANTE" hidden>
+        <div class="hoja">
+          <h2 class="titulo">Agendar una asesoría</h2>
+          <p class="nota">Dinos qué necesitas y cuándo; te asignamos un tutor disponible. Cada asesoría dura 90 minutos y cuesta $200.</p>
+          <div id="avisoReserva"></div>
+          <form id="formReserva" class="preguntas">
+            <label class="pregunta"><span>¿Qué materia necesitas?</span>
+              <select id="rMateria">
+                <option>Python</option><option>Bases de datos</option><option>Redes</option>
+                <option>Seguridad</option><option>Matemáticas</option><option>Química</option>
+              </select>
+            </label>
+            <label class="pregunta"><span>¿Qué tema quieres repasar?</span>
+              <input id="rTema" placeholder="Por ejemplo: funciones y listas" required>
+            </label>
+            <div class="pregunta"><span>¿Cómo prefieres tomarla?</span>
+              <div class="opciones">
+                <label><input type="radio" name="modalidad" value="EN_LINEA" checked> En línea</label>
+                <label><input type="radio" name="modalidad" value="PRESENCIAL"> En persona</label>
+              </div>
+            </div>
+            <label class="pregunta" id="preguntaZona" hidden><span>¿En qué zona?</span>
+              <select id="rZona"><option>Monterrey</option><option>Apodaca</option><option>San Nicolás</option></select>
+            </label>
+            <label class="pregunta"><span>¿Cuándo?</span>
+              <input id="rInicio" type="datetime-local" required>
+              <small>Con al menos 2 días (48 horas) de anticipación. Hora de Monterrey.</small>
+            </label>
+            <div class="botones"><button class="boton" type="submit">Agendar y pagar $200</button></div>
+          </form>
+        </div>
+        <div class="hoja">
+          <h2 class="titulo">Mis asesorías</h2>
+          <p class="nota">Para cancelar o cambiar una asesoría, contacta a Soporte. Puedes calificar a tu tutor durante las 24 horas siguientes a la clase.</p>
+          <div id="avisoMias"></div>
+          <div id="misAsesorias" class="asesorias"></div>
+        </div>
+      </section>
+
+      <!-- TUTOR -->
+      <section id="vista-TUTOR" hidden>
+        <div class="hoja">
+          <h2 class="titulo">Mi agenda</h2>
+          <p class="nota">Las asesorías se te asignan solas según tu disponibilidad, hasta 5 por día.</p>
+          <div id="resumenTutor"></div>
+          <div id="agendaTutor" class="asesorias"></div>
+        </div>
+        <div class="hoja">
+          <h2 class="titulo">Mi disponibilidad</h2>
+          <div id="dispTutor"></div>
+        </div>
+      </section>
+
+      <!-- SOPORTE -->
+      <section id="vista-SOPORTE" hidden>
+        <div class="hoja">
+          <h2 class="titulo">Asesorías por atender</h2>
+          <p class="nota">Desde aquí cancelas asesorías, registras cuánto duró cada clase y pagas al tutor. El sistema calcula solo los reembolsos y las penalizaciones.</p>
+          <div class="pestanas" role="tablist">
+            <button role="tab" aria-selected="true" data-filtro="CONFIRMADA">Próximas</button>
+            <button role="tab" aria-selected="false" data-filtro="COMPLETADA">Por pagar al tutor</button>
+            <button role="tab" aria-selected="false" data-filtro="TODAS">Todas</button>
+          </div>
+          <div id="avisoSoporte"></div>
+          <div id="listaSoporte" class="asesorias"></div>
+        </div>
+      </section>
+
+      <!-- ADMINISTRADOR -->
+      <section id="vista-ADMINISTRADOR" hidden>
+        <div class="pestanas" role="tablist">
+          <button role="tab" aria-selected="true" data-admin="reportes">Reportes</button>
+          <button role="tab" aria-selected="false" data-admin="comision">Comisión</button>
+          <button role="tab" aria-selected="false" data-admin="inscripciones">Inscripciones a cursos</button>
+        </div>
+        <div data-panel="reportes">
+          <div class="hoja">
+            <h2 class="titulo">Cómo va la operación</h2>
+            <form id="formReporte" class="botones" style="margin-bottom:12px">
+              <label>Desde <input id="repDesde" type="date" required></label>
+              <label>Hasta <input id="repHasta" type="date" required></label>
+              <button class="boton chico" type="submit">Ver reporte</button>
+            </form>
+            <div id="reporteSesiones"></div>
+          </div>
+          <div class="hoja">
+            <h2 class="titulo">Tutores con más cancelaciones</h2>
+            <div id="reporteCancelaciones"></div>
+          </div>
+        </div>
+        <div data-panel="comision" hidden>
+          <div class="hoja">
+            <h2 class="titulo">Comisión de la plataforma</h2>
+            <p class="nota">Es la parte de cada asesoría que se queda AulaPlus. El cambio aplica a los pagos a tutores que se hagan de aquí en adelante.</p>
+            <div id="avisoComision"></div>
+            <form id="formComision" class="preguntas">
+              <label class="pregunta"><span>Porcentaje de comisión</span>
+                <input id="comision" type="number" min="0" max="100" step="0.5" required style="max-width:8em">
+                <small id="ejemploComision"></small>
+              </label>
+              <div class="botones"><button class="boton" type="submit">Guardar comisión</button></div>
+            </form>
+          </div>
+        </div>
+        <div data-panel="inscripciones" hidden>
+          <div class="hoja">
+            <h2 class="titulo">Inscripciones a cursos</h2>
+            <p class="nota">Datos de prueba del profesor. Cada inscripción avanza en orden: preinscrita, validada, inscrita y finalizada.</p>
+            <div id="avisoInscripcion"></div>
+            <div class="tabla-scroll">
+              <table>
+                <thead><tr><th>Inscripción</th><th>Estudiante</th><th class="num">Total</th><th>Situación</th><th>Siguiente paso</th></tr></thead>
+                <tbody id="tablaInscripciones"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="hoja" id="panelTecnico" hidden aria-live="polite">
+      <h2 class="titulo" style="font-size:1.3rem">Respuestas de la API</h2>
+      <p class="nota">Solo se ve en modo técnico. <a href="/docs">Abrir Swagger</a></p>
+      <ul class="bitacora" id="bitacora"><li class="vacio">Aún no hay peticiones.</li></ul>
+    </aside>
+  </div>
+</div>
+
+<dialog id="dlgUsuario">
+  <h3 id="dlgUsuarioTitulo">¿Quién eres?</h3>
+  <p class="nota">En la versión real entrarías con tu correo y contraseña.</p>
+  <select id="dlgUsuarioLista" style="width:100%"></select>
+  <div class="botones" style="margin-top:16px">
+    <button class="boton" id="dlgUsuarioOk">Entrar</button>
+    <button class="boton claro" id="dlgUsuarioCancelar">Volver</button>
+  </div>
+</dialog>
+
+<dialog id="dlgCancelar">
+  <h3>Cancelar asesoría</h3>
+  <p id="dlgCancelarQue" class="nota"></p>
+  <div class="preguntas">
+    <div class="pregunta"><span>¿Quién pide la cancelación?</span>
+      <div class="opciones">
+        <label><input type="radio" name="solicitante" value="ESTUDIANTE" checked> El estudiante</label>
+        <label><input type="radio" name="solicitante" value="TUTOR"> El tutor</label>
+      </div>
+    </div>
+    <div class="opciones"><label><input type="checkbox" id="justificada"> Presentó justificante médico o legal</label></div>
+    <label class="pregunta"><span>Motivo</span><input id="motivo" placeholder="Por ejemplo: el estudiante tiene examen"></label>
+  </div>
+  <div class="consecuencia" id="consecuencia"></div>
+  <div class="botones">
+    <button class="boton peligro" id="dlgCancelarOk">Confirmar cancelación</button>
+    <button class="boton claro" id="dlgCancelarNo">No cancelar</button>
+  </div>
+</dialog>
+
+<script>
+const ZONA = "-06:00";
+const DOS_DIAS = 48 * 3600 * 1000;
+const $ = (id) => document.getElementById(id);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const dinero = (v) => Number(v).toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+const fechaBonita = (iso) => new Date(iso).toLocaleString("es-MX", { timeZone: "America/Monterrey", weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" });
+
+const estado = { rol: null, usuario: null, tutores: {}, estudiantes: [], filtroSoporte: "CONFIRMADA" };
+
+/* ---------- Comunicación con la API ---------- */
+async function api(metodo, ruta, { cuerpo, rol } = {}) {
+  const headers = {};
+  if (cuerpo !== undefined) headers["Content-Type"] = "application/json";
+  if (rol) headers["X-Rol"] = rol;
+  let codigo = 0, datos = null;
+  try {
+    const r = await fetch(ruta, { method: metodo, headers, body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined });
+    codigo = r.status;
+    const texto = await r.text();
+    try { datos = texto ? JSON.parse(texto) : null; } catch { datos = texto; }
+  } catch (e) {
+    datos = { detalle: "No hay conexión con el servidor. Revisa tu internet e intenta de nuevo." };
+  }
+  if (metodo !== "GET") anotar(metodo, ruta, rol, codigo, datos);
+  return { ok: codigo >= 200 && codigo < 300, codigo, datos };
+}
+
+/* Traduce el error de la API a algo que cualquiera entienda. */
+function mensajeAmable(r) {
+  const d = r.datos || {};
+  if (r.codigo === 402) return "El pago no se pudo procesar. No se te cobró nada; intenta con otro método de pago.";
+  if (r.codigo === 403) return d.detalle || "Tu usuario no tiene permiso para hacer esto.";
+  if (r.codigo === 404) return "No encontramos ese registro. Actualiza la página.";
+  if (d.error === "TransicionInvalida") return "Esa acción no se puede hacer por la situación actual del registro.";
+  if (Array.isArray(d.detail)) return "Falta información o algún dato no es válido.";
+  return d.detalle || "Algo salió mal. Intenta de nuevo.";
+}
+
+function aviso(contenedor, tipo, titulo, texto) {
+  $(contenedor).innerHTML = `<div class="aviso ${tipo}" role="status"><b>${esc(titulo)}</b>${esc(texto)}</div>`;
+}
+
+function anotar(metodo, ruta, rol, codigo, datos) {
+  const lista = $("bitacora");
+  lista.querySelector(".vacio")?.remove();
+  const li = document.createElement("li");
+  const ok = codigo >= 200 && codigo < 300;
+  li.innerHTML = `<span class="codigo ${ok ? "ok" : "error"}">${codigo || "—"}</span>
+    <span class="peticion">${esc(metodo)} ${esc(ruta)}${rol ? " · X-Rol " + esc(rol) : ""}</span>
+    <details><summary>JSON</summary><pre>${esc(JSON.stringify(datos, null, 2))}</pre></details>`;
+  lista.prepend(li);
+}
+
+/* ---------- Navegación ---------- */
+function mostrar(vista) {
+  document.querySelectorAll("section[id^=vista-]").forEach(s => s.hidden = s.id !== "vista-" + vista);
+  $("cambiarRol").hidden = vista === "inicio";
+  $("quienSoy").hidden = vista === "inicio";
+}
+$("modoTecnico").addEventListener("change", (e) => {
+  $("panelTecnico").hidden = !e.target.checked;
+  $("area").className = e.target.checked ? "con-bitacora" : "";
+});
+$("inicio").addEventListener("click", () => mostrar("inicio"));
+$("cambiarRol").addEventListener("click", () => mostrar("inicio"));
+document.querySelectorAll(".rol").forEach(b => b.addEventListener("click", () => elegirRol(b.dataset.rol)));
+
+function elegirRol(rol) {
+  estado.rol = rol;
+  if (rol === "ESTUDIANTE" || rol === "TUTOR") {
+    const lista = rol === "ESTUDIANTE"
+      ? estado.estudiantes.map(e => [e.id, `${e.nombre} (${e.id})`])
+      : Object.values(estado.tutores).map(t => [t.id, `${t.nombre} (${t.id})`]);
+    $("dlgUsuarioTitulo").textContent = rol === "ESTUDIANTE" ? "¿Qué estudiante eres?" : "¿Qué tutor eres?";
+    $("dlgUsuarioLista").innerHTML = lista.map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("");
+    $("dlgUsuario").showModal();
+    return;
+  }
+  entrar(rol, null);
+}
+$("dlgUsuarioCancelar").addEventListener("click", () => $("dlgUsuario").close());
+$("dlgUsuarioOk").addEventListener("click", () => { $("dlgUsuario").close(); entrar(estado.rol, $("dlgUsuarioLista").value); });
+
+function entrar(rol, usuario) {
+  estado.usuario = usuario;
+  const nombres = { SOPORTE: "Soporte", ADMINISTRADOR: "Administración" };
+  const nombre = rol === "TUTOR" ? estado.tutores[usuario]?.nombre
+    : rol === "ESTUDIANTE" ? estado.estudiantes.find(e => e.id === usuario)?.nombre : nombres[rol];
+  $("quienSoy").innerHTML = `Entraste como <strong>${esc(nombre)}</strong>`;
+  mostrar(rol);
+  ({ ESTUDIANTE: cargarEstudiante, TUTOR: cargarTutor, SOPORTE: cargarSoporte, ADMINISTRADOR: cargarReportes })[rol]();
+}
+
+/* ---------- Estados contados en palabras ---------- */
+const ESTADOS = {
+  CONFIRMADA: { txt: "Agendada y pagada", color: "azul", explica: "La clase está confirmada." },
+  COMPLETADA: { txt: "Clase terminada", color: "verde", explica: "La clase se dio completa. Falta pagarle al tutor." },
+  LIQUIDADA: { txt: "Terminada y pagada al tutor", color: "verde", explica: "Todo quedó cerrado." },
+  REEMBOLSADA: { txt: "Reembolsada", color: "roja", explica: "La grabación duró menos del 70 % de la clase, así que se devolvieron los $200 al estudiante." },
+  CANCELADA: { txt: "Cancelada", color: "roja", explica: "" },
+};
+const nombreTutor = (id) => estado.tutores[id]?.nombre || id;
+const nombreEstudiante = (id) => estado.estudiantes.find(e => e.id === id)?.nombre || id;
+
+function explicacion(s) {
+  if (s.estado !== "CANCELADA") return ESTADOS[s.estado].explica;
+  const r = Number(s.monto_reembolso) > 0
+    ? `Se devolvieron ${dinero(s.monto_reembolso)} al estudiante.`
+    : "No hubo reembolso porque se canceló con menos de 2 días de anticipación.";
+  return r + (s.tutor_penalizado ? " El tutor recibió una penalización." : "");
+}
+
+function cabeceraAsesoria(s, para) {
+  const e = ESTADOS[s.estado];
+  const con = para === "TUTOR" ? `con ${esc(nombreEstudiante(s.estudiante_id))}` : `con ${esc(nombreTutor(s.tutor_id))}`;
+  const lugar = s.modalidad === "EN_LINEA" ? "en línea" : `en persona, ${esc(s.zona || "")}`;
+  return `<div class="cuando">${esc(fechaBonita(s.inicio))}</div>
+    <div class="quien">${esc(s.materia)} (${esc(s.tema)}), ${con}, ${lugar}</div>
+    <span class="etiqueta ${e.color}">${e.txt}</span>
+    <p class="explica">${esc(explicacion(s))}</p>`;
+}
+
+/* ---------- Estudiante ---------- */
+document.querySelectorAll("input[name=modalidad]").forEach(r => r.addEventListener("change", () => {
+  $("preguntaZona").hidden = document.querySelector("input[name=modalidad]:checked").value !== "PRESENCIAL";
+}));
+
+function fechaLocalInput(ms) {
+  const partes = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Monterrey", year: "numeric", month: "2-digit",
+    day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(ms));
+  const p = Object.fromEntries(partes.map(x => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+}
+const fechaSugerida = () => fechaLocalInput(Date.now() + 3 * 86400000).slice(0, 11) + "10:00";
+
+$("formReserva").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const modalidad = document.querySelector("input[name=modalidad]:checked").value;
+  const cuerpo = { estudiante_id: estado.usuario, materia: $("rMateria").value, tema: $("rTema").value.trim(),
+                   modalidad, inicio: $("rInicio").value + ":00" + ZONA };
+  if (modalidad === "PRESENCIAL") cuerpo.zona = $("rZona").value;
+  const r = await api("POST", "/sesiones", { cuerpo, rol: "ESTUDIANTE" });
+  if (r.ok) {
+    aviso("avisoReserva", "bien", "¡Listo! Tu asesoría quedó agendada.",
+      ` Se cobraron $200. Tu tutor es ${nombreTutor(r.datos.tutor_id)} y la clase es el ${fechaBonita(r.datos.inicio)}`);
+    $("formReserva").reset(); $("preguntaZona").hidden = true; $("rInicio").value = fechaSugerida();
+    cargarEstudiante();
+  } else {
+    aviso("avisoReserva", "mal", "No se pudo agendar.", " " + mensajeAmable(r));
+  }
+});
+
+async function cargarEstudiante() {
+  const r = await api("GET", "/sesiones");
+  const mias = (r.ok ? r.datos : []).filter(s => s.estudiante_id === estado.usuario).reverse();
+  const cont = $("misAsesorias");
+  if (!mias.length) { cont.innerHTML = '<p class="vacio">Aún no tienes asesorías. Agenda la primera arriba.</p>'; return; }
+  cont.innerHTML = "";
+  mias.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "asesoria"; div.dataset.estado = s.estado;
+    let extra = "";
+    if (["COMPLETADA", "LIQUIDADA"].includes(s.estado)) {
+      extra = s.calificacion_tutor
+        ? `<p>Calificaste a tu tutor con ${s.calificacion_tutor} de 5 estrellas.</p>`
+        : `<div class="botones"><span>Califica a tu tutor:</span><div class="estrellas">${[1,2,3,4,5].map(n =>
+            `<button data-n="${n}" aria-label="${n} de 5 estrellas">★</button>`).join("")}</div></div>`;
+    }
+    div.innerHTML = cabeceraAsesoria(s, "ESTUDIANTE") + extra;
+    const estrellas = div.querySelectorAll(".estrellas button");
+    estrellas.forEach(b => {
+      const pintar = (n) => estrellas.forEach(x => x.classList.toggle("on", +x.dataset.n <= n));
+      b.addEventListener("mouseenter", () => pintar(+b.dataset.n));
+      b.addEventListener("focus", () => pintar(+b.dataset.n));
+      b.addEventListener("click", async () => {
+        const rr = await api("POST", `/sesiones/${encodeURIComponent(s.id)}/calificaciones`, { cuerpo: { puntuacion: +b.dataset.n }, rol: "ESTUDIANTE" });
+        if (rr.ok) aviso("avisoMias", "bien", "Gracias por calificar.", " Tu opinión ayuda a otros estudiantes.");
+        else aviso("avisoMias", "mal", "No se pudo guardar tu calificación.", " " + mensajeAmable(rr));
+        cargarEstudiante();
+      });
+    });
+    cont.appendChild(div);
+  });
+}
+
+/* ---------- Tutor ---------- */
+const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+async function cargarTutor() {
+  const [rs, rt] = await Promise.all([api("GET", "/sesiones"), api("GET", "/tutores/" + encodeURIComponent(estado.usuario))]);
+  const mias = (rs.ok ? rs.datos : []).filter(s => s.tutor_id === estado.usuario);
+  const pagado = mias.filter(s => s.monto_tutor).reduce((a, s) => a + Number(s.monto_tutor), 0);
+  const t = rt.ok ? rt.datos : {};
+  $("resumenTutor").innerHTML = `<div class="cifras">
+    <div class="cifra"><span>Próximas clases</span><b>${mias.filter(s => s.estado === "CONFIRMADA").length}</b></div>
+    <div class="cifra"><span>Te hemos pagado</span><b>${dinero(pagado)}</b></div>
+    <div class="cifra"><span>Cancelaciones</span><b>${t.cancelaciones ?? 0}</b></div>
+    <div class="cifra" style="border-color:${t.penalizaciones ? "var(--rojo)" : "var(--verde)"}"><span>Penalizaciones</span><b>${t.penalizaciones ?? 0}</b></div>
+  </div>`;
+  const cont = $("agendaTutor");
+  cont.innerHTML = mias.length ? "" : '<p class="vacio">Todavía no tienes asesorías asignadas.</p>';
+  mias.reverse().forEach(s => {
+    const div = document.createElement("div");
+    div.className = "asesoria"; div.dataset.estado = s.estado;
+    div.innerHTML = cabeceraAsesoria(s, "TUTOR") + (s.monto_tutor ? `<p>Recibiste ${dinero(s.monto_tutor)} por esta clase.</p>` : "");
+    cont.appendChild(div);
+  });
+  $("dispTutor").innerHTML = t.bloques ? `
+    <p class="nota">Materias: ${esc(t.materias.join(", "))}. Modalidad: ${t.modalidades.map(m => m === "EN_LINEA" ? "en línea" : "en persona").join(" y ")}. Zona: ${esc(t.zona)}.</p>
+    <table><tbody>${t.bloques.map(b => `<tr><td>${DIAS[b.dia_semana]}</td><td>de ${b.hora_inicio.slice(0,5)} a ${b.hora_fin.slice(0,5)}</td></tr>`).join("")}</tbody></table>` : "";
+}
+
+/* ---------- Soporte ---------- */
+document.querySelectorAll("[data-filtro]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("[data-filtro]").forEach(x => x.setAttribute("aria-selected", x === b));
+  estado.filtroSoporte = b.dataset.filtro;
+  $("avisoSoporte").innerHTML = "";
+  cargarSoporte();
+}));
+
+async function cargarSoporte() {
+  const r = await api("GET", "/sesiones");
+  let lista = r.ok ? r.datos : [];
+  if (estado.filtroSoporte !== "TODAS") lista = lista.filter(s => s.estado === estado.filtroSoporte);
+  const cont = $("listaSoporte");
+  if (!lista.length) { cont.innerHTML = '<p class="vacio">No hay asesorías en esta lista.</p>'; return; }
+  cont.innerHTML = "";
+  lista.reverse().forEach(s => {
+    const div = document.createElement("div");
+    div.className = "asesoria"; div.dataset.estado = s.estado;
+    let acciones = "";
+    if (s.estado === "CONFIRMADA") {
+      acciones = `<div class="botones">
+          <button class="boton chico claro" data-a="terminar">Registrar cómo terminó la clase</button>
+          <button class="boton chico peligro claro" data-a="cancelar">Cancelar asesoría</button>
+        </div>
+        <div class="panel" data-panel-terminar hidden>
+          <label class="pregunta"><span>¿Cuántos minutos duró la grabación?</span>
+            <input type="number" min="1" max="200" value="90" style="max-width:8em" data-min>
+            <small>La clase dura 90 minutos. Si la grabación dura menos de 63 (el 70 %), se devuelven los $200 al estudiante.</small>
+          </label>
+          <div class="botones"><button class="boton chico" data-a="guardarTerminar">Guardar</button></div>
+        </div>`;
+    } else if (s.estado === "COMPLETADA") {
+      acciones = `<div class="botones"><button class="boton chico" data-a="pagar">Pagar al tutor</button></div>`;
+    }
+    div.innerHTML = cabeceraAsesoria(s, "SOPORTE") +
+      `<p class="quien" style="margin-top:-6px">Estudiante: ${esc(nombreEstudiante(s.estudiante_id))}</p>` + acciones;
+    div.addEventListener("click", async (e) => {
+      const a = e.target.dataset?.a; if (!a) return;
+      const base = "/sesiones/" + encodeURIComponent(s.id);
+      if (a === "terminar") { div.querySelector("[data-panel-terminar]").hidden = false; div.querySelector("[data-min]").focus(); return; }
+      if (a === "cancelar") { abrirCancelacion(s); return; }
+      let r;
+      if (a === "guardarTerminar") {
+        const min = +div.querySelector("[data-min]").value;
+        const ini = new Date(s.inicio);
+        r = await api("POST", base + "/grabacion", { rol: "SISTEMA", cuerpo: {
+          url: `https://grabaciones.aulaplus.mx/${s.id}.mp4`, inicio: ini.toISOString(), fin: new Date(ini.getTime() + min * 60000).toISOString() } });
+        if (r.ok) aviso("avisoSoporte", "bien",
+          r.datos.estado === "COMPLETADA" ? "Clase registrada como terminada." : "Clase reembolsada.",
+          r.datos.estado === "COMPLETADA" ? " Ya puedes pagarle al tutor en «Por pagar al tutor»." : " La grabación no llegó al 70 %; se devolvieron $200 al estudiante.");
+      }
+      if (a === "pagar") {
+        r = await api("POST", base + "/liquidacion", { rol: "SISTEMA" });
+        if (r.ok) aviso("avisoSoporte", "bien", "Pago enviado.",
+          ` El tutor recibió ${dinero(r.datos.monto_tutor)} y AulaPlus se quedó con ${dinero(r.datos.comision)} de comisión.`);
+      }
+      if (r && !r.ok) aviso("avisoSoporte", "mal", "No se pudo completar.", " " + mensajeAmable(r));
+      cargarSoporte();
+    });
+    cont.appendChild(div);
+  });
+}
+
+/* Antes de cancelar se explica qué va a pasar con el dinero y con el tutor. */
+let cancelando = null;
+function abrirCancelacion(s) {
+  cancelando = s;
+  $("dlgCancelarQue").textContent = `${s.materia} con ${nombreTutor(s.tutor_id)}, ${fechaBonita(s.inicio)}`;
+  $("motivo").value = ""; $("justificada").checked = false;
+  document.querySelector("input[name=solicitante][value=ESTUDIANTE]").checked = true;
+  actualizarConsecuencia();
+  $("dlgCancelar").showModal();
+}
+function actualizarConsecuencia() {
+  if (!cancelando) return;
+  const quien = document.querySelector("input[name=solicitante]:checked").value;
+  const justificada = $("justificada").checked;
+  const conTiempo = new Date(cancelando.inicio).getTime() - Date.now() >= DOS_DIAS;
+  let t;
+  if (quien === "ESTUDIANTE") t = conTiempo
+    ? "Faltan más de 2 días: se devolverán los $200 al estudiante."
+    : "Faltan menos de 2 días: no habrá reembolso para el estudiante.";
+  else t = (conTiempo || justificada)
+    ? "Se devolverán los $200 al estudiante. El tutor no recibe penalización."
+    : "Faltan menos de 2 días y no hay justificante: se devolverán los $200 al estudiante y el tutor recibirá una penalización.";
+  $("consecuencia").innerHTML = `<b>Qué va a pasar:</b> ${t}`;
+}
+document.querySelectorAll("input[name=solicitante]").forEach(r => r.addEventListener("change", actualizarConsecuencia));
+$("justificada").addEventListener("change", actualizarConsecuencia);
+$("dlgCancelarNo").addEventListener("click", () => $("dlgCancelar").close());
+$("dlgCancelarOk").addEventListener("click", async () => {
+  const cuerpo = { solicitante: document.querySelector("input[name=solicitante]:checked").value,
+                   motivo: $("motivo").value.trim() || "Sin motivo especificado", justificada: $("justificada").checked };
+  const r = await api("POST", `/sesiones/${encodeURIComponent(cancelando.id)}/cancelacion`, { cuerpo, rol: estado.rol });
+  $("dlgCancelar").close();
+  if (r.ok) aviso("avisoSoporte", "bien", "Asesoría cancelada.", " " + explicacion(r.datos));
+  else aviso("avisoSoporte", "mal", "No se pudo cancelar.", " " + mensajeAmable(r));
+  cargarSoporte();
+});
+
+/* ---------- Administración ---------- */
+document.querySelectorAll("[data-admin]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("[data-admin]").forEach(x => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== b.dataset.admin);
+  if (b.dataset.admin === "reportes") cargarReportes();
+  if (b.dataset.admin === "comision") cargarComision();
+  if (b.dataset.admin === "inscripciones") cargarInscripciones();
+}));
+
+const NOMBRE_REPORTE = { CONFIRMADA: "Agendadas", COMPLETADA: "Terminadas", LIQUIDADA: "Pagadas al tutor", REEMBOLSADA: "Reembolsadas", CANCELADA: "Canceladas" };
+async function cargarReportes(e) {
+  e?.preventDefault();
+  const q = new URLSearchParams({ desde: $("repDesde").value + "T00:00:00" + ZONA, hasta: $("repHasta").value + "T23:59:59" + ZONA });
+  const r = await api("GET", "/reportes/sesiones?" + q, { rol: "ADMINISTRADOR" });
+  if (r.ok) {
+    const d = r.datos;
+    $("reporteSesiones").innerHTML = `<div class="cifras">
+      ${Object.entries(d.por_estado).map(([k, v]) => `<div class="cifra"><span>${NOMBRE_REPORTE[k] || k}</span><b>${v}</b></div>`).join("")}
+    </div>
+    <table><tbody>
+      <tr><td>Cobrado a estudiantes</td><td class="num">${dinero(d.total_cobrado)}</td></tr>
+      <tr><td>Ganancia de AulaPlus (comisiones)</td><td class="num">${dinero(d.total_comisiones)}</td></tr>
+      <tr><td>Devuelto a estudiantes</td><td class="num">${dinero(d.total_reembolsado)}</td></tr>
+    </tbody></table>`;
+  }
+  const c = await api("GET", "/reportes/cancelaciones-tutores", { rol: "ADMINISTRADOR" });
+  if (c.ok) $("reporteCancelaciones").innerHTML = `<table><thead><tr><th>Tutor</th><th class="num">Cancelaciones</th><th>Situación</th></tr></thead><tbody>
+    ${c.datos.map(f => `<tr><td>${esc(f.nombre)}</td><td class="num">${f.cancelaciones}</td><td>${f.penalizaciones
+      ? `<span class="etiqueta roja">Penalizado (${f.penalizaciones})</span>` : "Sin penalización"}</td></tr>`).join("")}</tbody></table>`;
+}
+$("formReporte").addEventListener("submit", cargarReportes);
+
+async function cargarComision() {
+  const r = await api("GET", "/politicas");
+  if (r.ok) { $("comision").value = Number(r.datos.porcentaje_comision); ejemploComision(); }
+}
+function ejemploComision() {
+  const p = Number($("comision").value) || 0;
+  $("ejemploComision").textContent = `Con ${p} %, de cada asesoría de $200 AulaPlus se queda ${dinero(200 * p / 100)} y el tutor recibe ${dinero(200 - 200 * p / 100)}.`;
+}
+$("comision").addEventListener("input", ejemploComision);
+$("formComision").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const r = await api("PUT", "/politicas/comision", { rol: "ADMINISTRADOR", cuerpo: { porcentaje: $("comision").value } });
+  if (r.ok) aviso("avisoComision", "bien", "Comisión guardada.", " Se aplicará a los próximos pagos a tutores.");
+  else aviso("avisoComision", "mal", "No se pudo guardar.", " " + mensajeAmable(r));
+});
+
+const SITUACION = { PREINSCRITA: "Preinscrita", VALIDADA: "Validada", INSCRITA: "Inscrita", FINALIZADA: "Finalizada", CANCELADA: "Cancelada" };
+const SIGUIENTE = { PREINSCRITA: ["validar", "Validar datos"], VALIDADA: ["inscribir", "Inscribir"], INSCRITA: ["finalizar", "Finalizar curso"] };
+async function cargarInscripciones() {
+  const r = await api("GET", "/inscripciones");
+  if (!r.ok) return;
+  $("tablaInscripciones").innerHTML = r.datos.map(i => {
+    const sig = SIGUIENTE[i.estado];
+    const problemas = [!i.autorizada && "sin autorización", !i.lineas.length && "sin cursos"].filter(Boolean);
+    const color = i.estado === "CANCELADA" ? "roja" : i.estado === "FINALIZADA" ? "verde" : "azul";
+    return `<tr>
+      <td>${esc(i.id)}</td>
+      <td>${esc(nombreEstudiante(i.estudiante_id))}${problemas.length ? `<br><small class="quien">${problemas.join(", ")}</small>` : ""}</td>
+      <td class="num">${dinero(i.total)}</td>
+      <td><span class="etiqueta ${color}">${SITUACION[i.estado]}</span></td>
+      <td><div class="botones">
+        ${sig ? `<button class="boton chico" data-ins="${esc(i.id)}" data-a="${sig[0]}">${sig[1]}</button>` : ""}
+        ${["PREINSCRITA", "VALIDADA"].includes(i.estado) ? `<button class="boton chico peligro claro" data-ins="${esc(i.id)}" data-a="cancelar">Cancelar</button>` : ""}
+      </div></td></tr>`;
+  }).join("");
+}
+$("tablaInscripciones").addEventListener("click", async (e) => {
+  const id = e.target.dataset?.ins, a = e.target.dataset?.a; if (!id) return;
+  const cuerpo = a === "cancelar" ? { motivo: "Cancelada por Administración" } : undefined;
+  const r = await api("POST", `/inscripciones/${encodeURIComponent(id)}/${a}`, { cuerpo });
+  if (r.ok) aviso("avisoInscripcion", "bien", `Inscripción ${id}: ${SITUACION[r.datos.estado].toLowerCase()}.`, "");
+  else aviso("avisoInscripcion", "mal", `No se pudo avanzar la inscripción ${id}.`, " " +
+    (String(r.datos?.detalle || "").startsWith("No puede procesarse")
+      ? "Le falta algo: el estudiante debe estar activo, tener al menos un curso y contar con autorización."
+      : r.codigo === 409 && a === "inscribir" ? "Uno de sus cursos no tiene lugares o no está disponible." : mensajeAmable(r)));
+  cargarInscripciones();
+});
+
+/* ---------- Arranque ---------- */
+(async function iniciar() {
+  $("rInicio").value = fechaSugerida();
+  $("rInicio").min = fechaLocalInput(Date.now() + DOS_DIAS);
+  const dia = (ms) => fechaLocalInput(ms).slice(0, 10);
+  $("repDesde").value = dia(Date.now() - 30 * 86400000);
+  $("repHasta").value = dia(Date.now() + 60 * 86400000);
+  const [re, rt] = await Promise.all([api("GET", "/estudiantes"), api("GET", "/tutores")]);
+  estado.estudiantes = re.ok ? re.datos.filter(e => e.activo) : [];
+  (rt.ok ? rt.datos : []).forEach(t => estado.tutores[t.id] = t);
+  mostrar("inicio");
+})();
+</script>
+</body>
+</html>

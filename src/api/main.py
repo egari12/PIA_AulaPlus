@@ -6,8 +6,10 @@ Swagger:   http://localhost:8000/docs     OpenAPI: /openapi.json
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse
 
 from src.api import rutas_admin, rutas_inscripciones, rutas_sesiones
 from src.api.errores import registrar_manejadores
@@ -17,6 +19,8 @@ from src.infrastructure.cargador_csv import cargar_paquete, poblar
 from src.infrastructure.db import crear_engine, crear_fabrica_sesiones
 from src.infrastructure.externos import PasarelaSimulada, RelojSistema
 from src.infrastructure.repositorios_sql import UnidadDeTrabajoSQL
+
+INTERFAZ = Path(__file__).resolve().parent / "static" / "index.html"
 
 DESCRIPCION = """
 API de **AulaPlus**: asesorías uno a uno entre estudiantes y tutores.
@@ -61,8 +65,9 @@ def create_app(
     app.include_router(rutas_inscripciones.router)
 
     @app.get("/", include_in_schema=False)
-    def raiz() -> RedirectResponse:
-        return RedirectResponse(url="/docs")
+    def interfaz() -> FileResponse:
+        """Interfaz web de demostración; consume la misma API que Swagger (/docs)."""
+        return FileResponse(INTERFAZ, media_type="text/html")
 
     @app.get("/salud", tags=["Salud"], summary="Verificación de vida")
     def salud() -> dict:
