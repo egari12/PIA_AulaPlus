@@ -105,3 +105,5 @@ Ver [`docs/BRD.md`](docs/BRD.md) §6 y la [matriz de trazabilidad](docs/architec
 
 ## Paquete de pruebas del docente
 Los CSV de `datos/` modelan inscripciones a cursos, distinto del BRD. Se implementaron en un contexto separado (`src/domain/inscripciones`, ADR-006) sin modificar las reglas de sesiones. Resultados actuales: 46 operaciones cumplen `puede_procesarse`, 9 aplican al beneficio; detalle en `docs/evidencias/`.
+
+#Link Render: https://dashboard.render.com/web/srv-dbmoddtg1s2s73bfhot0
