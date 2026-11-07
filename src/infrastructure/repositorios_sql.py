@@ -16,6 +16,7 @@ from src.domain.inscripciones.modelo import (
     Inscripcion,
     LineaInscripcion,
 )
+from src.domain.registro import Cuenta
 from src.domain.sesiones.modelo import (
     BloqueDisponibilidad,
     CambioPendiente,
@@ -27,6 +28,7 @@ from src.domain.sesiones.modelo import (
     Tutor,
 )
 from src.infrastructure.db import (
+    CuentaRow,
     CursoRow,
     EstudianteRow,
     EventoRow,
@@ -237,6 +239,18 @@ class RepositorioEstudiantesSQL:
         self.s.merge(EstudianteRow(id=e.id, nombre=e.nombre, preferente=e.preferente, activo=e.activo, ciudad=e.ciudad))
 
 
+class RepositorioCuentasSQL:
+    def __init__(self, sesion_sql: SessionSQL):
+        self.s = sesion_sql
+
+    def obtener(self, correo: str) -> Cuenta | None:
+        fila = self.s.get(CuentaRow, correo)
+        return Cuenta(fila.correo, fila.usuario_id, fila.tipo) if fila else None
+
+    def guardar(self, c: Cuenta) -> None:
+        self.s.merge(CuentaRow(correo=c.correo, usuario_id=c.usuario_id, tipo=c.tipo.value))
+
+
 class RepositorioCursosSQL:
     def __init__(self, sesion_sql: SessionSQL):
         self.s = sesion_sql
@@ -328,6 +342,7 @@ class UnidadDeTrabajoSQL:
         self.sesiones = RepositorioSesionesSQL(self.sesion_sql)
         self.politicas = RepositorioPoliticasSQL(self.sesion_sql)
         self.estudiantes = RepositorioEstudiantesSQL(self.sesion_sql)
+        self.cuentas = RepositorioCuentasSQL(self.sesion_sql)
         self.cursos = RepositorioCursosSQL(self.sesion_sql)
         self.inscripciones = RepositorioInscripcionesSQL(self.sesion_sql)
 

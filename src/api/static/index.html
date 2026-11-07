@@ -219,6 +219,7 @@
         <div class="hoja">
           <h2 class="titulo">Mi agenda</h2>
           <p class="nota">Las asesorías se te asignan solas según tu disponibilidad, hasta 5 por día.</p>
+          <div id="avisoTutor"></div>
           <div id="resumenTutor"></div>
           <div id="agendaTutor" class="asesorias"></div>
         </div>
@@ -305,12 +306,100 @@
 
 <dialog id="dlgUsuario">
   <h3 id="dlgUsuarioTitulo">¿Quién eres?</h3>
-  <p class="nota">En la versión real entrarías con tu correo y contraseña.</p>
+  <p class="nota" id="dlgUsuarioNota">En la versión real entrarías con tu correo y contraseña.</p>
   <select id="dlgUsuarioLista" style="width:100%"></select>
   <div class="botones" style="margin-top:16px">
     <button class="boton" id="dlgUsuarioOk">Entrar</button>
     <button class="boton claro" id="dlgUsuarioCancelar">Volver</button>
   </div>
+  <div id="zonaCuenta" hidden>
+    <hr style="margin:20px 0;border:0;border-top:1px solid var(--linea)">
+    <form id="formAcceso" class="preguntas">
+      <label class="pregunta"><span id="accesoTitulo">¿Ya tienes cuenta? Entra con tu correo</span>
+        <input id="accesoCorreo" type="email" placeholder="tu@correo.com" required maxlength="254" autocomplete="email">
+      </label>
+      <div id="avisoAcceso"></div>
+      <div class="botones">
+        <button class="boton claro" type="submit">Entrar con mi correo</button>
+        <button class="boton claro" type="button" id="abrirRegistro">Soy nuevo: crear cuenta</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="dlgRegistroTutor" style="max-height:92vh;overflow:auto">
+  <h3>Crear mi cuenta de tutor</h3>
+  <p class="nota">Dinos qué enseñas y cuándo puedes dar clases. Las asesorías se te asignarán solas. Es una cuenta de prueba: no lleva contraseña.</p>
+  <form id="formRegistroTutor" class="preguntas">
+    <label class="pregunta"><span>Nombre</span>
+      <input id="tutNombre" required minlength="2" maxlength="120" autocomplete="name" placeholder="Por ejemplo: Carlos Méndez">
+    </label>
+    <label class="pregunta"><span>Correo</span>
+      <input id="tutCorreo" type="email" required maxlength="254" autocomplete="email" placeholder="tu@correo.com">
+    </label>
+    <div class="pregunta"><span>¿Qué materias das?</span>
+      <div class="opciones" id="tutMaterias">
+        <label><input type="checkbox" value="Python"> Python</label>
+        <label><input type="checkbox" value="Bases de datos"> Bases de datos</label>
+        <label><input type="checkbox" value="Redes"> Redes</label>
+        <label><input type="checkbox" value="Seguridad"> Seguridad</label>
+        <label><input type="checkbox" value="Matemáticas"> Matemáticas</label>
+        <label><input type="checkbox" value="Química"> Química</label>
+      </div>
+    </div>
+    <div class="pregunta"><span>¿Cómo das clase?</span>
+      <div class="opciones" id="tutModalidades">
+        <label><input type="checkbox" value="EN_LINEA" checked> En línea</label>
+        <label><input type="checkbox" value="PRESENCIAL"> En persona</label>
+      </div>
+    </div>
+    <label class="pregunta"><span>¿En qué zona?</span>
+      <select id="tutZona"><option>Monterrey</option><option>Apodaca</option><option>San Nicolás</option><option>Guadalupe</option><option>San Pedro</option></select>
+    </label>
+    <div class="pregunta"><span>¿Qué días puedes?</span>
+      <div class="opciones" id="tutDias">
+        <label><input type="checkbox" value="0" checked> Lun</label>
+        <label><input type="checkbox" value="1"> Mar</label>
+        <label><input type="checkbox" value="2" checked> Mié</label>
+        <label><input type="checkbox" value="3"> Jue</label>
+        <label><input type="checkbox" value="4"> Vie</label>
+        <label><input type="checkbox" value="5"> Sáb</label>
+      </div>
+    </div>
+    <div class="pregunta"><span>¿En qué horario? (hora de Monterrey)</span>
+      <div class="opciones">
+        <label>De <input id="tutDesde" type="time" value="09:00" required></label>
+        <label>a <input id="tutHasta" type="time" value="14:00" required></label>
+      </div>
+      <small>Cada asesoría dura 90 minutos; deja al menos ese tiempo.</small>
+    </div>
+    <div id="avisoRegistroTutor"></div>
+    <div class="botones">
+      <button class="boton" type="submit">Crear mi cuenta de tutor</button>
+      <button class="boton claro" type="button" id="tutCancelar">Volver</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgRegistro">
+  <h3>Crear mi cuenta</h3>
+  <p class="nota">Solo necesitas tu nombre, tu correo y tu ciudad. Es una cuenta de prueba: no lleva contraseña.</p>
+  <form id="formRegistro" class="preguntas">
+    <label class="pregunta"><span>Nombre</span>
+      <input id="regNombre" required minlength="2" maxlength="120" autocomplete="name" placeholder="Por ejemplo: Ana López">
+    </label>
+    <label class="pregunta"><span>Correo</span>
+      <input id="regCorreo" type="email" required maxlength="254" autocomplete="email" placeholder="tu@correo.com">
+    </label>
+    <label class="pregunta"><span>Ciudad</span>
+      <select id="regCiudad"><option>Monterrey</option><option>Apodaca</option><option>San Nicolás</option><option>Guadalupe</option><option>San Pedro</option></select>
+    </label>
+    <div id="avisoRegistro"></div>
+    <div class="botones">
+      <button class="boton" type="submit">Crear mi cuenta</button>
+      <button class="boton claro" type="button" id="regCancelar">Volver</button>
+    </div>
+  </form>
 </dialog>
 
 <dialog id="dlgCancelar">
@@ -408,6 +497,12 @@ function elegirRol(rol) {
       ? estado.estudiantes.map(e => [e.id, `${e.nombre} (${e.id})`])
       : Object.values(estado.tutores).map(t => [t.id, `${t.nombre} (${t.id})`]);
     $("dlgUsuarioTitulo").textContent = rol === "ESTUDIANTE" ? "¿Qué estudiante eres?" : "¿Qué tutor eres?";
+    $("dlgUsuarioNota").textContent = rol === "ESTUDIANTE"
+      ? "Elige un estudiante de prueba, entra con tu correo o crea tu cuenta."
+      : "Elige un tutor de prueba, entra con tu correo o crea tu cuenta.";
+    $("abrirRegistro").textContent = rol === "ESTUDIANTE" ? "Soy nuevo: crear cuenta" : "Soy tutor nuevo: crear cuenta";
+    $("zonaCuenta").hidden = false;
+    $("avisoAcceso").innerHTML = "";
     $("dlgUsuarioLista").innerHTML = lista.map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("");
     $("dlgUsuario").showModal();
     return;
@@ -416,6 +511,70 @@ function elegirRol(rol) {
 }
 $("dlgUsuarioCancelar").addEventListener("click", () => $("dlgUsuario").close());
 $("dlgUsuarioOk").addEventListener("click", () => { $("dlgUsuario").close(); entrar(estado.rol, $("dlgUsuarioLista").value); });
+
+/* ---------- Cuenta de estudiante (US-19): registro con correo, sin contraseña ---------- */
+function entrarConCuenta(cuenta, titulo, texto) {
+  const esTutor = cuenta.id.startsWith("AUL-T");
+  if (esTutor) estado.tutores[cuenta.id] = cuenta;
+  else if (!estado.estudiantes.some(e => e.id === cuenta.id)) estado.estudiantes.push({ ...cuenta, activo: true });
+  $("dlgUsuario").close(); $("dlgRegistro").close(); $("dlgRegistroTutor").close();
+  entrar(esTutor ? "TUTOR" : "ESTUDIANTE", cuenta.id);
+  aviso(esTutor ? "avisoTutor" : "avisoReserva", "bien", titulo, texto);
+}
+$("formAcceso").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const ruta = estado.rol === "TUTOR" ? "/tutores/acceso" : "/estudiantes/acceso";
+  const r = await api("POST", ruta, { cuerpo: { correo: $("accesoCorreo").value.trim() } });
+  if (r.ok) {
+    $("formAcceso").reset();
+    entrarConCuenta(r.datos, `¡Hola de nuevo, ${r.datos.nombre}!`,
+      ` Tu número de ${estado.rol === "TUTOR" ? "tutor" : "estudiante"} es ${r.datos.id}.`);
+  } else {
+    aviso("avisoAcceso", "mal", "No pudimos entrar.",
+      r.codigo === 404 ? ` No hay ninguna cuenta de ${estado.rol === "TUTOR" ? "tutor" : "estudiante"} con ese correo. Revisa que esté bien escrito o crea una cuenta.` : " " + mensajeAmable(r));
+  }
+});
+$("abrirRegistro").addEventListener("click", () => {
+  const tutor = estado.rol === "TUTOR";
+  $(tutor ? "avisoRegistroTutor" : "avisoRegistro").innerHTML = "";
+  $(tutor ? "tutCorreo" : "regCorreo").value = $("accesoCorreo").value.trim();
+  $("dlgUsuario").close(); $(tutor ? "dlgRegistroTutor" : "dlgRegistro").showModal();
+});
+$("tutCancelar").addEventListener("click", () => { $("dlgRegistroTutor").close(); $("dlgUsuario").showModal(); });
+const marcados = (id) => [...document.querySelectorAll(`#${id} input:checked`)].map(i => i.value);
+$("formRegistroTutor").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const materias = marcados("tutMaterias"), modalidades = marcados("tutModalidades"), dias = marcados("tutDias");
+  const falta = !materias.length ? "Elige al menos una materia." : !modalidades.length ? "Elige al menos una modalidad."
+    : !dias.length ? "Elige al menos un día." : $("tutHasta").value <= $("tutDesde").value ? "La hora final debe ser después de la inicial." : "";
+  if (falta) return aviso("avisoRegistroTutor", "mal", "Revisa tus datos.", " " + falta);
+  const bloques = dias.map(d => ({ dia_semana: Number(d), hora_inicio: $("tutDesde").value, hora_fin: $("tutHasta").value }));
+  const cuerpo = { nombre: $("tutNombre").value.trim(), correo: $("tutCorreo").value.trim(), materias, modalidades,
+                   zona: $("tutZona").value, bloques };
+  const r = await api("POST", "/tutores", { cuerpo });
+  if (r.ok) {
+    $("formRegistroTutor").reset();
+    entrarConCuenta(r.datos, `¡Bienvenido(a), ${r.datos.nombre}! Tu cuenta de tutor quedó creada.`,
+      ` Tu número de tutor es ${r.datos.id}. Desde ahora se te pueden asignar asesorías. Para volver a entrar, usa tu correo ${r.datos.correo}.`);
+  } else {
+    aviso("avisoRegistroTutor", "mal", "No se pudo crear la cuenta.",
+      r.codigo === 409 ? " Ya existe una cuenta con ese correo. Vuelve y entra con tu correo." : " " + mensajeAmable(r));
+  }
+});
+$("regCancelar").addEventListener("click", () => { $("dlgRegistro").close(); $("dlgUsuario").showModal(); });
+$("formRegistro").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const cuerpo = { nombre: $("regNombre").value.trim(), correo: $("regCorreo").value.trim(), ciudad: $("regCiudad").value };
+  const r = await api("POST", "/estudiantes", { cuerpo });
+  if (r.ok) {
+    $("formRegistro").reset();
+    entrarConCuenta(r.datos, `¡Bienvenido(a), ${r.datos.nombre}! Tu cuenta quedó creada.`,
+      ` Tu número de estudiante es ${r.datos.id}. Para volver a entrar, usa tu correo ${r.datos.correo}.`);
+  } else {
+    aviso("avisoRegistro", "mal", "No se pudo crear la cuenta.",
+      r.codigo === 409 ? " Ya existe una cuenta con ese correo. Vuelve y entra con tu correo." : " " + mensajeAmable(r));
+  }
+});
 
 function entrar(rol, usuario) {
   estado.usuario = usuario;

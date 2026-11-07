@@ -8,6 +8,7 @@ import pytest
 
 pytest.importorskip("sqlalchemy")
 
+from src.application.servicios_estudiantes import ServicioEstudiantes  # noqa: E402
 from src.application.servicios_inscripciones import ServicioInscripciones  # noqa: E402
 from src.application.servicios_sesiones import ServicioSesiones  # noqa: E402
 from src.domain.comun import Dinero, Rol  # noqa: E402
@@ -112,4 +113,16 @@ def test_inscripcion_y_politica_en_bd(fabrica):
     assert uow.cursos.obtener("AUL-P009").cupo == 37 - 3
     assert uow.politicas.obtener().porcentaje_comision == Decimal("30")
     assert len(uow.inscripciones.eventos_de("AUL-O001")) == 2
+    uow.cerrar()
+
+
+def test_cuenta_de_estudiante_en_bd(fabrica):
+    uow = nueva_uow(fabrica)
+    ServicioEstudiantes(uow).registrar("Ana López", "ana@correo.com", "Monterrey")
+    uow.cerrar()
+    uow = nueva_uow(fabrica)
+    assert uow.cuentas.obtener("ana@correo.com").usuario_id == "AUL-E001"
+    assert uow.estudiantes.obtener("AUL-E001").nombre == "Ana López"
+    assert len(uow.estudiantes.listar()) == 41
+    assert ServicioEstudiantes(uow).acceder("ANA@correo.com").estudiante.id == "AUL-E001"
     uow.cerrar()

@@ -86,6 +86,15 @@ class EstudianteRow(Base):
     ciudad: Mapped[str] = mapped_column(String(80), default="")
 
 
+class CuentaRow(Base):
+    """Tabla nueva (US-19, US-20): create_all la crea sola, también en una base que ya existía."""
+
+    __tablename__ = "cuentas"
+    correo: Mapped[str] = mapped_column(String(254), primary_key=True)
+    usuario_id: Mapped[str] = mapped_column(String(40), index=True)
+    tipo: Mapped[str] = mapped_column(String(20))
+
+
 class CursoRow(Base):
     __tablename__ = "cursos"
     id: Mapped[str] = mapped_column(String(40), primary_key=True)

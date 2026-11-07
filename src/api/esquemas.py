@@ -209,6 +209,47 @@ class EstudianteSalida(BaseModel):
         return cls(id=e.id, nombre=e.nombre, preferente=e.preferente, activo=e.activo, ciudad=e.ciudad)
 
 
+class RegistroEntrada(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=120, examples=["Ana López"])
+    correo: str = Field(..., max_length=254, examples=["ana@correo.com"])
+    ciudad: str = Field(..., min_length=2, max_length=80, examples=["Monterrey"])
+
+
+class AccesoEntrada(BaseModel):
+    correo: str = Field(..., max_length=254, examples=["ana@correo.com"])
+
+
+class CuentaSalida(BaseModel):
+    id: str
+    nombre: str
+    ciudad: str
+    correo: str
+
+    @classmethod
+    def de(cls, registro) -> CuentaSalida:
+        e = registro.estudiante
+        return cls(id=e.id, nombre=e.nombre, ciudad=e.ciudad, correo=registro.correo)
+
+
+class RegistroTutorEntrada(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=120, examples=["Carlos Méndez"])
+    correo: str = Field(..., max_length=254, examples=["carlos@correo.com"])
+    materias: list[str] = Field(..., examples=[["Química", "Matemáticas"]])
+    modalidades: list[Modalidad] = Field(..., examples=[["EN_LINEA", "PRESENCIAL"]])
+    zona: str = Field(..., min_length=2, max_length=80, examples=["Monterrey"])
+    bloques: list[BloqueEntrada] = Field(
+        ..., description="Horarios semanales en hora de Monterrey; al menos uno"
+    )
+
+
+class CuentaTutorSalida(TutorSalida):
+    correo: str
+
+    @classmethod
+    def de_registro(cls, registro) -> CuentaTutorSalida:
+        return cls(**TutorSalida.de(registro.tutor).model_dump(), correo=registro.correo)
+
+
 class CursoSalida(BaseModel):
     id: str
     descripcion: str

@@ -53,6 +53,7 @@ class UnidadDeTrabajoMemoria:
         self.tutores = _RepositorioMemoria()
         self.sesiones = _RepositorioMemoria()
         self.estudiantes = _RepositorioMemoria()
+        self.cuentas = _RepositorioMemoria()
         self.cursos = _RepositorioMemoria()
         self.inscripciones = _RepositorioMemoria()
         self.politicas = RepositorioPoliticasMemoria()

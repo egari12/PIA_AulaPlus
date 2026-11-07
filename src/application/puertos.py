@@ -12,6 +12,7 @@ from typing import Protocol
 
 from src.domain.comun import Dinero, EventoDominio
 from src.domain.inscripciones.modelo import Curso, Estudiante, Inscripcion
+from src.domain.registro import Cuenta
 from src.domain.sesiones.modelo import PoliticaTarifas, Sesion, Tutor
 
 
@@ -49,6 +50,11 @@ class RepositorioEstudiantes(Protocol):
     def guardar(self, estudiante: Estudiante) -> None: ...
 
 
+class RepositorioCuentas(Protocol):
+    def obtener(self, correo: str) -> Cuenta | None: ...
+    def guardar(self, cuenta: Cuenta) -> None: ...
+
+
 class RepositorioCursos(Protocol):
     def obtener(self, curso_id: str) -> Curso | None: ...
     def listar(self) -> list[Curso]: ...
@@ -69,6 +75,7 @@ class UnidadDeTrabajo(Protocol):
     sesiones: RepositorioSesiones
     politicas: RepositorioPoliticas
     estudiantes: RepositorioEstudiantes
+    cuentas: RepositorioCuentas
     cursos: RepositorioCursos
     inscripciones: RepositorioInscripciones
 

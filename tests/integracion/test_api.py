@@ -162,3 +162,47 @@ def test_crear_inscripcion(cliente):
     assert r.status_code == 201 and r.json()["total"] == "810.00"
     cuerpo["lineas"][0]["cantidad"] = 0
     assert cliente.post("/inscripciones", json=cuerpo).status_code == 422
+
+
+def test_registro_de_estudiante_y_acceso_us19(cliente):
+    ana = {"nombre": "Ana López", "correo": "ana@correo.com", "ciudad": "Monterrey"}
+    r = cliente.post("/estudiantes", json=ana)
+    assert r.status_code == 201, r.text
+    assert r.json() == {"id": "AUL-E001", "nombre": "Ana López", "ciudad": "Monterrey", "correo": "ana@correo.com"}
+    repetido = cliente.post("/estudiantes", json={**ana, "correo": "ANA@correo.com"})
+    assert repetido.status_code == 409 and repetido.json()["error"] == "RecursoNoDisponible"
+    assert cliente.post("/estudiantes", json={**ana, "correo": "no-es-correo"}).status_code == 422
+    assert cliente.post("/estudiantes/acceso", json={"correo": " Ana@Correo.com"}).json()["id"] == "AUL-E001"
+    assert cliente.post("/estudiantes/acceso", json={"correo": "nadie@correo.com"}).status_code == 404
+    assert any(e["id"] == "AUL-E001" for e in cliente.get("/estudiantes").json())
+    assert crear_sesion(cliente, estudiante="AUL-E001")["estudiante_id"] == "AUL-E001"
+
+
+def test_reserva_de_estudiante_inexistente_404(cliente):
+    r = cliente.post("/sesiones", json=reserva(estudiante="AUL-X999"), headers=ESTUDIANTE)
+    assert r.status_code == 404 and "AUL-X999" in r.json()["detalle"]
+
+
+def test_registro_de_tutor_y_asignacion_us20(cliente):
+    carlos = {
+        "nombre": "Carlos Méndez",
+        "correo": "carlos@correo.com",
+        "materias": ["Química"],
+        "modalidades": ["EN_LINEA"],
+        "zona": "Monterrey",
+        "bloques": [{"dia_semana": 3, "hora_inicio": "08:00", "hora_fin": "14:00"}],
+    }
+    r = cliente.post("/tutores", json=carlos)
+    assert r.status_code == 201, r.text
+    assert r.json()["id"] == "AUL-T06" and r.json()["materias"] == ["química"]
+    assert r.json()["correo"] == "carlos@correo.com"
+    assert cliente.post("/tutores", json=carlos).status_code == 409
+    sin_horario = cliente.post("/tutores", json={**carlos, "correo": "otro@correo.com", "bloques": []})
+    assert sin_horario.status_code == 422
+    al_reves = {**carlos, "correo": "otro@correo.com",
+                "bloques": [{"dia_semana": 3, "hora_inicio": "14:00", "hora_fin": "08:00"}]}
+    assert cliente.post("/tutores", json=al_reves).status_code == 422
+    assert cliente.post("/tutores/acceso", json={"correo": "CARLOS@correo.com"}).json()["id"] == "AUL-T06"
+    assert cliente.post("/tutores/acceso", json={"correo": "nadie@correo.com"}).status_code == 404
+    assert cliente.get("/tutores/AUL-T06").status_code == 200
+    assert crear_sesion(cliente, materia="Química")["tutor_id"] == "AUL-T06"

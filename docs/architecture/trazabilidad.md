@@ -21,6 +21,9 @@
 | US-09 | No quitar disponibilidad con sesiones | `Tutor.actualizar_disponibilidad` | `PUT /tutores/{id}/disponibilidad` | `test_tutor_no_quita_bloque_con_sesion_confirmada`, `test_actualizar_disponibilidad` |
 | US-15 | Reportes | `ServicioReportes` | `GET /reportes/...` | `test_reporte_de_sesiones`, `test_cancelacion_tardia_del_tutor_penaliza_y_aparece_en_reporte` |
 | US-16 | Comisión configurable a futuro | `ServicioPoliticas` | `PUT /politicas/comision` | `test_comision_nueva_aplica_a_liquidaciones_futuras` |
+| US-19 | Registro con correo único; ids AUL-E### | `ServicioEstudiantes`, `Cuenta`, `siguiente_id_estudiante` | `POST /estudiantes`, `POST /estudiantes/acceso` | `test_registrar_crea_estudiante_y_cuenta`, `test_correo_repetido_responde_conflicto`, `test_registro_de_estudiante_y_acceso_us19` |
+| US-20, NB-01 | Registro de tutor; entra en la asignación | `ServicioEstudiantes.registrar_tutor`, `Tutor`, `siguiente_id_tutor` | `POST /tutores`, `POST /tutores/acceso` | `test_registrar_tutor_crea_tutor_y_cuenta`, `test_tutor_nuevo_entra_en_la_asignacion`, `test_registro_de_tutor_y_asignacion_us20` |
+| US-19, US-01 | Solo estudiantes registrados reservan | `ServicioSesiones.reservar` | 404 | `test_solo_estudiantes_existentes_pueden_reservar`, `test_reserva_de_estudiante_inexistente_404` |
 | Estados de Sesion | Transiciones inválidas → 409 sin evento | `MAQUINA_SESION` | 409 | `test_no_se_registra_grabacion_dos_veces`, `test_grabacion_liquidacion` |
 | Paquete docente: `puede_procesarse` | activo ∧ detalle ∧ autorizada | `PUEDE_PROCESARSE` | `POST /inscripciones/{id}/validar` | `test_casos_coinciden_con_el_oraculo` (60 casos) |
 | Paquete docente: `beneficio_referencia` | preferente ∧ total ≥ 1500 ∧ ¬promoción | `BENEFICIO_REFERENCIA` | `GET /inscripciones/{id}/beneficio` | `test_casos_coinciden_con_el_oraculo` (60 casos), `test_beneficio_umbral_inclusivo_y_promocion` |

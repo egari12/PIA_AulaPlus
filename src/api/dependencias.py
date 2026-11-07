@@ -7,6 +7,7 @@ from collections.abc import Iterator
 from fastapi import Depends, Header, Request
 
 from src.application.reportes import ServicioReportes
+from src.application.servicios_estudiantes import ServicioEstudiantes
 from src.application.servicios_inscripciones import ServicioInscripciones
 from src.application.servicios_sesiones import ServicioPoliticas, ServicioSesiones
 from src.domain.comun import Rol
@@ -50,3 +51,7 @@ def servicio_inscripciones(
     request: Request, uow: UnidadDeTrabajoSQL = Depends(obtener_uow)
 ) -> ServicioInscripciones:
     return ServicioInscripciones(uow, request.app.state.reloj)
+
+
+def servicio_estudiantes(uow: UnidadDeTrabajoSQL = Depends(obtener_uow)) -> ServicioEstudiantes:
+    return ServicioEstudiantes(uow)

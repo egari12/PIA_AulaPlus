@@ -22,6 +22,8 @@ Refinadas de la Actividad 2. Las historias **US-17** y **US-18** se agregaron en
 | US-16 | Administrador | Definir políticas (comisión) | — | `test_comision_nueva_aplica_a_liquidaciones_futuras` |
 | US-17 | Tutor | Calificar al estudiante en 24 h | — | `test_calificacion_mutua_dentro_de_24_horas` |
 | US-18 | Estudiante | Inscribirse a cursos de asesoría | — | `tests/integracion/test_casos_csv.py` |
+| US-19 | Visitante | Crear su cuenta de estudiante y volver a entrar con su correo | — | `tests/unit/test_registro.py`, `test_registro_de_estudiante_y_acceso_us19` |
+| US-20 | Tutor | Crear su cuenta de tutor con materias, modalidades, zona y horarios | NB-01 | `test_registrar_tutor_crea_tutor_y_cuenta`, `test_registro_de_tutor_y_asignacion_us20` |
 
 ---
 
@@ -263,4 +265,54 @@ Escenario: Beneficio de referencia
   Dado un estudiante preferente con total >= 1500 MXN y sin promoción activa
   Cuando se evalúa el beneficio
   Entonces el beneficio aplica
+```
+
+### US-19 Registro de estudiantes (nueva, propuesta)
+Como visitante quiero crear mi cuenta de estudiante con mi nombre, correo y ciudad para agendar asesorías a mi nombre.
+No es autenticación: no hay contraseña y los permisos siguen saliendo de X-Rol (ADR-005).
+```gherkin
+Escenario: Crear una cuenta
+  Dado un visitante sin cuenta
+  Cuando se registra con nombre, correo válido y ciudad
+  Entonces se crea un estudiante activo con número AUL-E### y puede agendar asesorías
+
+Escenario: Correo repetido
+  Dado que ya existe una cuenta con el correo ana@correo.com
+  Cuando alguien intenta registrarse con ANA@correo.com
+  Entonces se responde 409 "Ya existe una cuenta con ese correo"
+
+Escenario: Volver a entrar
+  Dado un estudiante registrado
+  Cuando escribe su correo en "Ya tengo cuenta"
+  Entonces entra con su número de estudiante y ve sus asesorías
+
+Escenario: Reserva de un estudiante que no existe
+  Dado un número de estudiante que no está registrado
+  Cuando intenta reservar una sesión
+  Entonces se responde 404 y no se cobra nada
+```
+
+### US-20 Registro de tutores (nueva, propuesta)
+Como tutor quiero crear mi cuenta indicando qué materias doy, cómo doy clase, mi zona y mis horarios para que se me asignen asesorías.
+Igual que US-19, no es autenticación: no hay contraseña y los permisos siguen saliendo de X-Rol (ADR-005).
+```gherkin
+Escenario: Crear una cuenta de tutor
+  Dado un tutor sin cuenta
+  Cuando se registra con nombre, correo, al menos una materia, una modalidad, su zona y un horario
+  Entonces se crea el tutor con número AUL-T06 (o el siguiente) y entra en la asignación automática
+
+Escenario: Datos incompletos
+  Dado un tutor que no indica ninguna materia, modalidad u horario
+  Cuando intenta registrarse
+  Entonces se responde 422 y no se crea nada
+
+Escenario: Correo ya usado
+  Dado que el correo ya pertenece a un estudiante o a un tutor
+  Cuando alguien intenta registrar un tutor con ese correo
+  Entonces se responde 409 "Ya existe una cuenta con ese correo"
+
+Escenario: Se le asignan asesorías
+  Dado un tutor nuevo que imparte Química los jueves de 8:00 a 14:00
+  Cuando un estudiante reserva Química el jueves a las 10:00
+  Entonces la asesoría se le asigna a ese tutor
 ```
