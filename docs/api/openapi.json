@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AulaPlus API",
-    "description": "\nAPI de **AulaPlus**: asesorías uno a uno entre estudiantes y tutores.\n\n* **Sesiones** (BRD): reserva con 48 h de anticipación, asignación automática de tutor,\n  cobro de $200, grabación con umbral de 70 %, liquidación 80/20, cancelaciones por Soporte,\n  calificación en 24 h.\n* **Inscripciones**: contexto agregado para ejecutar el paquete de pruebas CSV del docente.\n\nEnvíe el encabezado **X-Rol** (ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA)\nen las operaciones que cambian datos de sesiones, tutores o políticas.\n",
+    "description": "\nAPI de AulaPlus (Equipo 8, FIME-UANL): asesorías uno a uno entre estudiantes y tutores.\n\n### Cómo probarla\n1. Consulta los tutores en `GET /tutores`.\n2. Reserva una sesión en `POST /sesiones` con **X-Rol** = `ESTUDIANTE` y al menos 48 h de anticipación.\n3. Consulta tu sesión en `GET /sesiones/{sesion_id}`.\n\n### Qué significa cada respuesta\n| Código | Significado |\n|---|---|\n| 200 | Todo salió bien |\n| 201 | Se creó correctamente |\n| 402 | El pago fue rechazado |\n| 403 | Tu rol (X-Rol) no tiene permiso para esta acción |\n| 404 | Lo que buscas no existe |\n| 409 | La acción no se puede hacer en este momento |\n| 422 | Faltan datos o no se cumple una regla del negocio |\n\nLos errores explican qué pasó en el campo `detalle`.\n",
     "version": "1.0.0"
   },
   "paths": {
@@ -2461,5 +2461,27 @@
         "title": "TutorSalida"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Sesiones",
+      "description": "Reservar, registrar la clase, pagar al tutor, cancelar, calificar y cambiar sesiones."
+    },
+    {
+      "name": "Tutores",
+      "description": "Consultar tutores y actualizar su disponibilidad."
+    },
+    {
+      "name": "Administración",
+      "description": "Tarifas de la plataforma y reportes (solo ADMINISTRADOR)."
+    },
+    {
+      "name": "Inscripciones (paquete CSV)",
+      "description": "Operaciones del paquete de pruebas del docente (catálogo, operaciones y transiciones)."
+    },
+    {
+      "name": "Salud",
+      "description": "Verifica que el servicio está en línea."
+    }
+  ]
 }

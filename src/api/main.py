@@ -23,16 +23,40 @@ from src.infrastructure.repositorios_sql import UnidadDeTrabajoSQL
 INTERFAZ = Path(__file__).resolve().parent / "static" / "index.html"
 
 DESCRIPCION = """
-API de **AulaPlus**: asesorías uno a uno entre estudiantes y tutores.
+API de AulaPlus (Equipo 8, FIME-UANL): asesorías uno a uno entre estudiantes y tutores.
 
-* **Sesiones** (BRD): reserva con 48 h de anticipación, asignación automática de tutor,
-  cobro de $200, grabación con umbral de 70 %, liquidación 80/20, cancelaciones por Soporte,
-  calificación en 24 h.
-* **Inscripciones**: contexto agregado para ejecutar el paquete de pruebas CSV del docente.
+### Cómo probarla
+1. Consulta los tutores en `GET /tutores`.
+2. Reserva una sesión en `POST /sesiones` con **X-Rol** = `ESTUDIANTE` y al menos 48 h de anticipación.
+3. Consulta tu sesión en `GET /sesiones/{sesion_id}`.
 
-Envíe el encabezado **X-Rol** (ESTUDIANTE, TUTOR, SOPORTE, ADMINISTRADOR o SISTEMA)
-en las operaciones que cambian datos de sesiones, tutores o políticas.
+### Qué significa cada respuesta
+| Código | Significado |
+|---|---|
+| 200 | Todo salió bien |
+| 201 | Se creó correctamente |
+| 402 | El pago fue rechazado |
+| 403 | Tu rol (X-Rol) no tiene permiso para esta acción |
+| 404 | Lo que buscas no existe |
+| 409 | La acción no se puede hacer en este momento |
+| 422 | Faltan datos o no se cumple una regla del negocio |
+
+Los errores explican qué pasó en el campo `detalle`.
 """
+
+ETIQUETAS = [
+    {
+        "name": "Sesiones",
+        "description": "Reservar, registrar la clase, pagar al tutor, cancelar, calificar y cambiar sesiones.",
+    },
+    {"name": "Tutores", "description": "Consultar tutores y actualizar su disponibilidad."},
+    {"name": "Administración", "description": "Tarifas de la plataforma y reportes (solo ADMINISTRADOR)."},
+    {
+        "name": "Inscripciones (paquete CSV)",
+        "description": "Operaciones del paquete de pruebas del docente (catálogo, operaciones y transiciones).",
+    },
+    {"name": "Salud", "description": "Verifica que el servicio está en línea."},
+]
 
 
 def create_app(
@@ -41,7 +65,7 @@ def create_app(
     pasarela: PasarelaPago | None = None,
 ) -> FastAPI:
     config = config or Configuracion.desde_entorno()
-    app = FastAPI(title="AulaPlus API", version="1.0.0", description=DESCRIPCION)
+    app = FastAPI(title="AulaPlus API", version="1.0.0", description=DESCRIPCION, openapi_tags=ETIQUETAS)
 
     engine = crear_engine(config.database_url)
     app.state.config = config
