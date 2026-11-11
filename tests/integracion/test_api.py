@@ -206,3 +206,55 @@ def test_registro_de_tutor_y_asignacion_us20(cliente):
     assert cliente.post("/tutores/acceso", json={"correo": "nadie@correo.com"}).status_code == 404
     assert cliente.get("/tutores/AUL-T06").status_code == 200
     assert crear_sesion(cliente, materia="Química")["tutor_id"] == "AUL-T06"
+
+
+def test_errores_claros_en_espanol(cliente):
+    """Todas las respuestas de error tienen error, titulo y detalle, en español."""
+    menos_48 = cliente.post("/sesiones", json=reserva(inicio=AHORA + timedelta(hours=10)), headers=ESTUDIANTE)
+    assert menos_48.status_code == 422
+    assert menos_48.json()["titulo"] == "No se cumple una regla del negocio"
+    assert "48 horas" in menos_48.json()["detalle"]
+
+    sin_rol = cliente.post("/sesiones", json=reserva())
+    assert sin_rol.status_code == 422 and sin_rol.json()["error"] == "DatosInvalidos"
+    assert sin_rol.json()["detalle"].startswith("Falta el encabezado X-Rol")
+    rol_raro = cliente.post("/sesiones", json=reserva(), headers={"X-Rol": "JEFE"})
+    assert "X-Rol no es válido" in rol_raro.json()["detalle"]
+
+    incompleta = {k: v for k, v in reserva().items() if k != "tema"}
+    faltante = cliente.post("/sesiones", json={**incompleta, "modalidad": "AVION"}, headers=ESTUDIANTE)
+    assert faltante.status_code == 422
+    assert "Falta el campo «tema»." in faltante.json()["detalle"]
+    assert "«modalidad» no es válido. Opciones: EN_LINEA o PRESENCIAL." in faltante.json()["detalle"]
+
+    roto = cliente.post("/sesiones", content="{no es json", headers={**ESTUDIANTE, "Content-Type": "application/json"})
+    assert "no es un JSON válido" in roto.json()["detalle"]
+
+    ruta = cliente.get("/no-existe")
+    assert ruta.status_code == 404 and ruta.json()["error"] == "RutaNoEncontrada"
+    metodo = cliente.delete("/sesiones")
+    assert metodo.status_code == 405 and metodo.json()["error"] == "MetodoNoPermitido"
+
+    sesion = crear_sesion(cliente)
+    liquidar = cliente.post(f"/sesiones/{sesion['id']}/liquidacion", headers=SISTEMA)
+    assert liquidar.status_code == 409
+    assert "solo se puede: cancelar, completar, reembolsar" in liquidar.json()["detalle"]
+
+
+def test_error_inesperado_responde_500_claro():
+    config = Configuracion(database_url="sqlite+pysqlite:///:memory:", sembrar_datos=False)
+    app = create_app(config, reloj=RelojFijo(AHORA))
+
+    @app.get("/explota")
+    def explota():
+        raise RuntimeError("fallo interno")
+
+    with TestClient(app, raise_server_exceptions=False) as c:
+        r = c.get("/explota")
+    app.state.engine.dispose()
+    assert r.status_code == 500
+    assert r.json() == {
+        "error": "ErrorInterno",
+        "titulo": "Algo falló en el servidor",
+        "detalle": "Ocurrió un error inesperado. Intenta de nuevo; si sigue pasando, avisa a Soporte.",
+    }

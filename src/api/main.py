@@ -41,7 +41,7 @@ API de AulaPlus (Equipo 8, FIME-UANL): asesorías uno a uno entre estudiantes y 
 | 409 | La acción no se puede hacer en este momento |
 | 422 | Faltan datos o no se cumple una regla del negocio |
 
-Los errores explican qué pasó en el campo `detalle`.
+Cada error trae `titulo` (qué significa en una frase) y `detalle` (qué pasó exactamente y cómo corregirlo).
 """
 
 ETIQUETAS = [

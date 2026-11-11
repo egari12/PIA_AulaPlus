@@ -23,8 +23,14 @@ class MaquinaEstados(Generic[E]):
         try:
             return self.transiciones[(estado, accion)]
         except KeyError:
+            posibles = self.acciones_desde(estado)
+            sugerencia = (
+                f"Desde {estado.value} solo se puede: {', '.join(posibles)}."
+                if posibles
+                else f"{estado.value} es un estado final: ya no admite cambios."
+            )
             raise TransicionInvalida(
-                f"{self.nombre}: no se permite '{accion}' desde el estado {estado.value}"
+                f"{self.nombre}: no se permite '{accion}' desde el estado {estado.value}. {sugerencia}"
             ) from None
 
     def acciones_desde(self, estado: E) -> list[str]:

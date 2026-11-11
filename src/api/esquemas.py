@@ -14,6 +14,7 @@ from src.domain.sesiones.modelo import Modalidad, Sesion, Solicitante, TipoCambi
 
 class ErrorSalida(BaseModel):
     error: str
+    titulo: str
     detalle: str
 
 

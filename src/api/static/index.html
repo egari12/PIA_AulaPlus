@@ -96,6 +96,7 @@
   .aviso { padding: 14px 16px; border-left: 5px solid; margin: 0 0 18px; }
   .aviso.bien { background: var(--verde-claro); border-color: var(--verde); }
   .aviso.mal { background: var(--rojo-claro); border-color: var(--rojo); }
+  .explica-error { display: block; color: var(--rojo); margin: 4px 0; }
   .aviso b { display: block; margin-bottom: 2px; }
 
   /* Tarjetas de asesoría */
@@ -455,10 +456,10 @@ function mensajeAmable(r) {
   const d = r.datos || {};
   if (r.codigo === 402) return "El pago no se pudo procesar. No se te cobró nada; intenta con otro método de pago.";
   if (r.codigo === 403) return d.detalle || "Tu usuario no tiene permiso para hacer esto.";
-  if (r.codigo === 404) return "No encontramos ese registro. Actualiza la página.";
-  if (d.error === "TransicionInvalida") return "Esa acción no se puede hacer por la situación actual del registro.";
-  if (Array.isArray(d.detail)) return "Falta información o algún dato no es válido.";
-  return d.detalle || "Algo salió mal. Intenta de nuevo.";
+  if (d.error === "TransicionInvalida") return "Esa acción no se puede hacer por la situación actual del registro. Actualiza la página.";
+  if (d.error === "ErrorInterno") return "Algo falló en el servidor. Intenta de nuevo en un momento.";
+  // La API siempre explica el error en «detalle» (en español, breve).
+  return d.detalle || d.titulo || "Algo salió mal. Intenta de nuevo.";
 }
 
 function aviso(contenedor, tipo, titulo, texto) {
@@ -472,6 +473,7 @@ function anotar(metodo, ruta, rol, codigo, datos) {
   const ok = codigo >= 200 && codigo < 300;
   li.innerHTML = `<span class="codigo ${ok ? "ok" : "error"}">${codigo || "—"}</span>
     <span class="peticion">${esc(metodo)} ${esc(ruta)}${rol ? " · X-Rol " + esc(rol) : ""}</span>
+    ${!ok && datos?.titulo ? `<small class="explica-error"><b>${esc(datos.titulo)}.</b> ${esc(datos.detalle || "")}</small>` : ""}
     <details><summary>JSON</summary><pre>${esc(JSON.stringify(datos, null, 2))}</pre></details>`;
   lista.prepend(li);
 }
