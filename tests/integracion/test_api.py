@@ -162,3 +162,22 @@ def test_crear_inscripcion(cliente):
     assert r.status_code == 201 and r.json()["total"] == "810.00"
     cuerpo["lineas"][0]["cantidad"] = 0
     assert cliente.post("/inscripciones", json=cuerpo).status_code == 422
+
+
+def test_registro_de_estudiante_y_acceso_us19(cliente):
+    ana = {"nombre": "Ana López", "correo": "ana@correo.com", "ciudad": "Monterrey"}
+    r = cliente.post("/estudiantes", json=ana)
+    assert r.status_code == 201, r.text
+    assert r.json() == {"id": "AUL-E001", "nombre": "Ana López", "ciudad": "Monterrey", "correo": "ana@correo.com"}
+    repetido = cliente.post("/estudiantes", json={**ana, "correo": "ANA@correo.com"})
+    assert repetido.status_code == 409 and repetido.json()["error"] == "RecursoNoDisponible"
+    assert cliente.post("/estudiantes", json={**ana, "correo": "no-es-correo"}).status_code == 422
+    assert cliente.post("/estudiantes/acceso", json={"correo": " Ana@Correo.com"}).json()["id"] == "AUL-E001"
+    assert cliente.post("/estudiantes/acceso", json={"correo": "nadie@correo.com"}).status_code == 404
+    assert any(e["id"] == "AUL-E001" for e in cliente.get("/estudiantes").json())
+    assert crear_sesion(cliente, estudiante="AUL-E001")["estudiante_id"] == "AUL-E001"
+
+
+def test_reserva_de_estudiante_inexistente_404(cliente):
+    r = cliente.post("/sesiones", json=reserva(estudiante="AUL-X999"), headers=ESTUDIANTE)
+    assert r.status_code == 404 and "AUL-X999" in r.json()["detalle"]
