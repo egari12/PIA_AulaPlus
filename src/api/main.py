@@ -11,7 +11,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
-from src.api import rutas_admin, rutas_inscripciones, rutas_sesiones
+from src.api import rutas_admin, rutas_estudiantes, rutas_inscripciones, rutas_sesiones
 from src.api.errores import registrar_manejadores
 from src.application.puertos import PasarelaPago, Reloj
 from src.config import Configuracion
@@ -50,6 +50,7 @@ ETIQUETAS = [
         "description": "Reservar, registrar la clase, pagar al tutor, cancelar, calificar y cambiar sesiones.",
     },
     {"name": "Tutores", "description": "Consultar tutores y actualizar su disponibilidad."},
+    {"name": "Estudiantes", "description": "Crear una cuenta de estudiante y volver a entrar con el correo."},
     {"name": "Administración", "description": "Tarifas de la plataforma y reportes (solo ADMINISTRADOR)."},
     {
         "name": "Inscripciones (paquete CSV)",
@@ -86,6 +87,7 @@ def create_app(
     app.include_router(rutas_sesiones.router)
     app.include_router(rutas_sesiones.router_tutores)
     app.include_router(rutas_admin.router)
+    app.include_router(rutas_estudiantes.router)
     app.include_router(rutas_inscripciones.router)
 
     @app.get("/", include_in_schema=False)

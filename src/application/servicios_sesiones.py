@@ -88,6 +88,8 @@ class ServicioSesiones:
     # -- US-01, US-02, US-03, US-10 ----------------------------------------- #
     def reservar(self, rol: Rol, solicitud: SolicitudReserva) -> Sesion:
         exigir_rol(rol, Rol.ESTUDIANTE)
+        if self.uow.estudiantes.obtener(solicitud.estudiante_id) is None:
+            raise NoEncontrado(f"El estudiante {solicitud.estudiante_id} no existe")
         ahora = self.reloj.ahora()
         if not AnticipacionMinima(ahora).es_satisfecha_por(solicitud):
             raise ReglaNegocioViolada(MSG_ANTICIPACION_RESERVA)
